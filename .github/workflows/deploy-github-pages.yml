@@ -7,6 +7,11 @@ on:
       - "frontend/**"
       - ".github/workflows/deploy-github-pages.yml"
   workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: Public API base URL the browser should call
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -31,7 +36,7 @@ jobs:
         working-directory: frontend
         env:
           VITE_BASE_PATH: /UTMCSSA-Internal-System/
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ github.event.inputs.api_base_url || secrets.VITE_API_BASE_URL }}
         run: |
           npm ci
           npm run build

@@ -161,11 +161,15 @@ class Settings(BaseSettings):
             if item.strip()
         ]
         primary = _as_browser_origin(self.frontend_base_url)
-        local_dev = "http://localhost:5173"
-        github_pages = "https://samwu429.github.io"
-        return list(
-            dict.fromkeys([item for item in (primary, local_dev, github_pages, *extras) if item])
+        always_allowed = (
+            "http://localhost:5173",
+            "https://samwu429.github.io",
+            "http://topphi.com",
+            "https://topphi.com",
+            "http://www.topphi.com",
+            "https://www.topphi.com",
         )
+        return list(dict.fromkeys([item for item in (primary, *always_allowed, *extras) if item]))
 
     @property
     def resolved_frontend_dist(self) -> Path | None:

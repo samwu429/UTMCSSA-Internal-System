@@ -70,10 +70,10 @@ The interface listens on `http://localhost:5173`.
 
 ## Public site
 
-The repository README is not the application. Members open the hosted site:
+The repository README is not the application. Members open the hosted interface:
 
-- Application: `https://utmcssa-internal-system.onrender.com/`
-- Mirror interface: `https://samwu429.github.io/UTMCSSA-Internal-System/`
+- `https://samwu429.github.io/UTMCSSA-Internal-System/`
+- `https://topphi.com/UTMCSSA-Internal-System/`
 
 After sign-in, administrators use **切换部门系统** at the top to open every department’s own page. The administrator role already carries every permission, so those pages are fully operable.
 
