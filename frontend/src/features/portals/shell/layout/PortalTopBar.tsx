@@ -7,7 +7,7 @@ import { SelectField } from '@/shared/ui/primitives/field/SelectField'
 
 export function PortalTopBar() {
   const profile = useAuthenticatedMember()
-  const { portal, isVisitingForOversight } = usePortalWorkspace()
+  const { portal, isVisitingForOversight, switchableDepartments } = usePortalWorkspace()
   const navigate = useNavigate()
 
   return (
@@ -25,7 +25,7 @@ export function PortalTopBar() {
         </div>
         {isVisitingForOversight ? (
           <p className="mt-0.5 text-xs text-neutral-500">
-            监管视图：您正在查看 {portal.name_zh} 的部门页面，操作仍按该部门权限与数据范围执行。
+            已切换到{portal.name_zh}自己的页面。当前账号可使用全部管理权限操作本部门系统。
           </p>
         ) : (
           <p className="mt-0.5 truncate text-xs text-neutral-500">
@@ -35,18 +35,18 @@ export function PortalTopBar() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        {profile.memberships.length > 1 ? (
+        {switchableDepartments.length > 1 ? (
           <SelectField
-            label="切换部门"
+            label="切换部门系统"
             value={portal.slug}
-            options={profile.memberships.map((membership) => ({
-              value: membership.department_slug,
-              label: membership.department_name_zh,
+            options={switchableDepartments.map((department) => ({
+              value: department.slug,
+              label: department.name_zh,
             }))}
             onChange={(event) => {
               void navigate(routePaths.portalRoot(event.target.value))
             }}
-            containerClassName="min-w-44"
+            containerClassName="min-w-52"
           />
         ) : null}
 

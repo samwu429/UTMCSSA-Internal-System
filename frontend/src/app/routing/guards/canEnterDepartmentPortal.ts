@@ -23,6 +23,15 @@ export function canEnterDepartmentPortal(profile: SessionProfile, departmentSlug
     return true
   }
 
+  return canOpenEveryDepartmentPortal(profile)
+}
+
+/**
+ * Presidium and platform administrators may open any department's own frontend.
+ *
+ * 主席团与平台管理员可打开任意部门自己的前端。
+ */
+export function canOpenEveryDepartmentPortal(profile: SessionProfile): boolean {
   if (profile.primary_portal?.has_organization_oversight === true) {
     return true
   }

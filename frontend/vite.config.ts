@@ -7,6 +7,7 @@ import { defineConfig } from 'vite'
 const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
+  base: process.env.VITE_BASE_PATH ?? '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

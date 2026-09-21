@@ -12,12 +12,14 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app.api.v1.router import api_router
-from app.core.config.settings import get_settings
+from app.core.config.settings import Settings, get_settings
 from app.core.errors.handlers import register_exception_handlers
 from app.domain.organization.services.provisioning_service import provision_organization
 from app.infrastructure.database.session import get_engine, session_scope
@@ -79,7 +81,7 @@ def create_application() -> FastAPI:
     # 避免恶意页面在成员浏览器中读取响应内容。
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.frontend_base_url],
+        allow_origins=settings.allowed_frontend_origins,
         allow_credentials=False,
         allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type"],
@@ -92,7 +94,37 @@ def create_application() -> FastAPI:
     async def health() -> dict[str, str]:
         return {"status": "ok", "environment": settings.environment}
 
+    _mount_frontend(application, settings)
     return application
+
+
+def _mount_frontend(application: FastAPI, settings: Settings) -> None:
+    """Serve the built member interface from the same host as the API when the files exist.
+
+    若已构建前端存在，则与接口同主机提供成员界面，公开地址只需一个。
+    """
+    dist = settings.resolved_frontend_dist
+    if dist is None:
+        return
+
+    assets = dist / "assets"
+    if assets.is_dir():
+        application.mount("/assets", StaticFiles(directory=assets), name="frontend-assets")
+
+    index_file = dist / "index.html"
+
+    @application.get("/{full_path:path}", include_in_schema=False)
+    async def serve_member_interface(full_path: str):
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404)
+        candidate = (dist / full_path).resolve()
+        try:
+            candidate.relative_to(dist.resolve())
+        except ValueError:
+            return FileResponse(index_file)
+        if candidate.is_file():
+            return FileResponse(candidate)
+        return FileResponse(index_file)
 
 
 app = create_application()

@@ -68,6 +68,19 @@ npm run dev
 
 The interface listens on `http://localhost:5173`.
 
+## Public site
+
+The repository README is not the application. Members open the hosted site:
+
+- Application: `https://utmcssa-internal-system.onrender.com/`
+- Mirror interface: `https://samwu429.github.io/UTMCSSA-Internal-System/`
+
+After sign-in, administrators use **切换部门系统** at the top to open every department’s own page. The administrator role already carries every permission, so those pages are fully operable.
+
+The first administrator is created from `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` on API startup. Remove those two values after the account exists.
+
+A free Render instance sleeps after idle time. The first request after sleep can take about a minute.
+
 ## Daily mail
 
 `SCHEDULER_ENABLED=true` sends the digest at `DAILY_DIGEST_HOUR`:`DAILY_DIGEST_MINUTE` in

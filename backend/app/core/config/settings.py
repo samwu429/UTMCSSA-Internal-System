@@ -11,6 +11,7 @@ values live in a gitignored ``.env`` file or in the deployment secret store.
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import Field, field_validator
@@ -20,6 +21,17 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # string it hands out, so they are translated rather than passed through.
 # libpq 接受但 asyncpg 拒绝的查询参数。Neon 默认生成的连接串包含这些参数，需转换而非直接透传。
 _LIBPQ_ONLY_QUERY_KEYS = frozenset({"sslmode", "channel_binding", "options"})
+
+
+def _as_browser_origin(url: str) -> str:
+    """Return scheme plus host so a GitHub Pages path is not treated as a CORS origin.
+
+    只保留协议与主机，避免把 GitHub Pages 的仓库路径误当成 CORS 来源。
+    """
+    parts = urlsplit(url.strip())
+    if parts.scheme and parts.netloc:
+        return f"{parts.scheme}://{parts.netloc}"
+    return url.strip().rstrip("/")
 
 
 def normalize_async_postgres_dsn(dsn: str) -> str:
@@ -55,7 +67,7 @@ class Settings(BaseSettings):
     """Typed view over the process environment."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=Path(__file__).resolve().parents[3] / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
@@ -67,7 +79,15 @@ class Settings(BaseSettings):
     # Public origin of the single-page frontend; used for CORS and for links embedded in emails.
     # 前端单页应用的公开地址；用于 CORS 与邮件正文中的跳转链接。
     frontend_base_url: str = Field(default="http://localhost:5173")
+    # Extra browser origins allowed to call the API, comma-separated. Local Vite is always included
+    # so a deployed API can still be developed against from this machine.
+    # 额外允许调用接口的浏览器来源，逗号分隔。本地 Vite 始终包含在内，便于已部署的接口仍可在本机联调。
+    cors_allowed_origins: str = Field(default="")
     api_base_path: str = Field(default="/api/v1")
+    # Built React files served by the API in a single-host deployment. Empty means "look beside
+    # this repository, and skip serving if the folder is absent".
+    # 单主机部署时由接口一并提供的已构建前端。留空则在仓库旁查找，找不到就不提供页面。
+    frontend_dist_dir: str = Field(default="")
 
     database_url: str = Field(default="postgresql+asyncpg://localhost/utmcssa")
     database_echo: bool = Field(default=False)
@@ -132,6 +152,31 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return tuple(item.strip().lower() for item in value.split(",") if item.strip())
         return value
+
+    @property
+    def allowed_frontend_origins(self) -> list[str]:
+        extras = [
+            _as_browser_origin(item)
+            for item in self.cors_allowed_origins.split(",")
+            if item.strip()
+        ]
+        primary = _as_browser_origin(self.frontend_base_url)
+        local_dev = "http://localhost:5173"
+        github_pages = "https://samwu429.github.io"
+        return list(
+            dict.fromkeys([item for item in (primary, local_dev, github_pages, *extras) if item])
+        )
+
+    @property
+    def resolved_frontend_dist(self) -> Path | None:
+        candidates: list[Path] = []
+        if self.frontend_dist_dir.strip():
+            candidates.append(Path(self.frontend_dist_dir.strip()))
+        candidates.append(Path(__file__).resolve().parents[4] / "frontend" / "dist")
+        for path in candidates:
+            if path.is_dir() and (path / "index.html").is_file():
+                return path
+        return None
 
     @property
     def sqlalchemy_url(self) -> str:
