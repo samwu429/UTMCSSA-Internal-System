@@ -77,7 +77,7 @@ export function AlumniNetworkPage() {
   return (
     <div className="space-y-6">
       <PageHeading
-        title="在校生与毕业生网络"
+        title="校友"
         englishTitle="Alumni network"
         description="按毕业年份与行业查找可联络的校友。联系方式只在对方愿意被联系时出现。"
       />
@@ -179,11 +179,11 @@ export function AlumniNetworkPage() {
               ) : (
                 <ul className="grid gap-4 md:grid-cols-2">
                   {pageData.items.map((person) => (
-                    <li key={person.user_id} className="rounded-lg border border-neutral-200 px-4 py-3">
+                    <li key={person.user_id} className="border border-[var(--line)] px-3 py-2.5">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="font-medium text-neutral-900">{person.display_name}</p>
-                          <p className="text-xs text-neutral-500">
+                          <p className="text-[13px] font-medium text-[var(--ink)]">{person.display_name}</p>
+                          <p className="text-xs text-[var(--ink-faint)]">
                             {person.graduation_year ?? '毕业年份未填'}
                             {person.program_of_study != null ? ` · ${person.program_of_study}` : ''}
                           </p>

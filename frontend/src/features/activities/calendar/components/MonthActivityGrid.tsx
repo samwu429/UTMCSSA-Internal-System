@@ -37,10 +37,10 @@ export function MonthActivityGrid({
 
   return (
     <div>
-      <p className="mb-3 text-sm font-medium text-neutral-800">{formatMonthLabel(month)}</p>
-      <div className="grid grid-cols-7 gap-1 text-xs">
+      <p className="mb-3 text-[13px] font-medium text-[var(--ink)]">{formatMonthLabel(month)}</p>
+      <div className="grid grid-cols-7 gap-px bg-[var(--line)] text-xs">
         {monthGridWeekdayHeadings.map((heading) => (
-          <div key={heading} className="px-1 py-1 text-center text-neutral-500">
+          <div key={heading} className="bg-[var(--paper)] px-1 py-1.5 text-center text-[var(--ink-muted)]">
             {heading}
           </div>
         ))}
@@ -49,12 +49,12 @@ export function MonthActivityGrid({
           return (
             <div
               key={day.toISOString()}
-              className="min-h-20 rounded-md border border-neutral-200 bg-white px-1.5 py-1"
+              className="min-h-20 bg-white px-1.5 py-1"
               style={offset === 0 ? { gridColumnStart: weekdayIndex + 1 } : undefined}
             >
-              <p className="text-neutral-500">{day.getDate()}</p>
+              <p className="font-mono text-[11px] text-[var(--ink-faint)]">{day.getDate()}</p>
               {dayActivities.slice(0, 2).map((activity) => (
-                <p key={activity.id} className="mt-1 truncate text-[11px] text-[var(--portal-accent-strong)]">
+                <p key={activity.id} className="mt-1 truncate text-[11px] text-[var(--brand)]">
                   {formatClockTime(activity.starts_at)} {activity.title}
                 </p>
               ))}

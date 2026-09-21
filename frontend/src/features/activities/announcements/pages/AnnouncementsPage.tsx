@@ -65,9 +65,8 @@ export function AnnouncementsPage() {
   return (
     <div className="space-y-6">
       <PageHeading
-        title={`${portal.name_zh}公告`}
-        englishTitle="Announcements"
-        description="部门内部通知与全社公告都从这里发出。勾选邮件后，成员会在学校邮箱收到同一内容。"
+        title="公告"
+        description="部门与全社通知。勾选邮件后会发到学校邮箱。"
       />
 
       {canPublish ? (
@@ -114,13 +113,13 @@ export function AnnouncementsPage() {
             ) : (
               <ul className="space-y-4">
                 {items.map((item) => (
-                  <li key={item.id} className="rounded-lg border border-neutral-200 px-4 py-3">
+                  <li key={item.id} className="border border-[var(--line)] px-3 py-2.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-medium text-neutral-900">{item.title}</p>
+                      <p className="text-[13px] font-medium text-[var(--ink)]">{item.title}</p>
                       {item.is_pinned ? <Badge tone="accent">置顶</Badge> : null}
                     </div>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-700">{item.body}</p>
-                    <p className="mt-2 text-xs text-neutral-500">
+                    <p className="mt-1 whitespace-pre-wrap text-[13px] text-[var(--ink)]">{item.body}</p>
+                    <p className="mt-2 font-mono text-[11px] text-[var(--ink-faint)]">
                       {item.author_name ?? '未署名'} · {formatDateTime(item.published_at)}
                       {item.emailed_at != null ? ' · 已邮件通知' : ''}
                     </p>

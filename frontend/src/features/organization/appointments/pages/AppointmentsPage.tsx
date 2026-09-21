@@ -70,20 +70,19 @@ export function AppointmentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PageHeading
-        title="任职与审批"
-        englishTitle="Offices"
+        title="任职"
         description={
           actingLens?.office_key === PRESIDIUM_PRESIDENT_ROLE_KEY || portal.slug === 'presidium'
-            ? '主席任命各部门部长、下一任主席和主席团成员。申请加入主席团的人在此审批为成员。'
-            : '部长可任命两名副部长。部长和副部长审批申请进入本部门担任部员的新成员。'
+            ? '任命各部门部长、下一任主席和主席团成员；审批加入主席团的申请。'
+            : '任命副部长（最多两名）；审批进入本部门担任部员的申请。'
         }
       />
 
       {canReview ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-neutral-900">待加入申请</h2>
+          <h2 className="text-[13px] font-semibold text-[var(--ink)]">待加入</h2>
           <QueryStateBoundary
             isPending={pendingQuery.isPending}
             error={pendingQuery.error}
@@ -151,7 +150,6 @@ export function AppointmentsPage() {
                   <Panel
                     key={department.department_id}
                     title={department.department_name_zh}
-                    description={department.department_name_en}
                   >
                     <div className="grid gap-3 md:grid-cols-2">
                       {department.offices.map((office) => (
@@ -199,13 +197,13 @@ function OfficeSeatCard({
   const remaining = Math.max(office.seat_limit - filled, 0)
 
   return (
-    <div className="rounded-lg border border-neutral-200 px-4 py-3">
+    <div className="border border-[var(--line)] px-3 py-2.5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-neutral-900">{officeHeading(office)}</p>
-          <p className="text-xs text-neutral-500">
-            {filled}/{office.seat_limit || '—'} 人在任
-            {remaining > 0 ? ` · 还可任命 ${remaining} 人` : ''}
+          <p className="text-[13px] font-medium text-[var(--ink)]">{officeHeading(office)}</p>
+          <p className="font-mono text-[11px] text-[var(--ink-faint)]">
+            {filled}/{office.seat_limit || '—'}
+            {remaining > 0 ? ` · 可再任 ${remaining}` : ''}
           </p>
         </div>
         {office.can_appoint && (remaining > 0 || office.seat_limit === 1) ? (
@@ -216,11 +214,11 @@ function OfficeSeatCard({
       </div>
       <ul className="mt-3 space-y-2">
         {office.holders.length === 0 ? (
-          <li className="text-xs text-neutral-500">目前空缺</li>
+          <li className="text-xs text-[var(--ink-faint)]">空缺</li>
         ) : (
           office.holders.map((holder) => (
             <li key={holder.membership_id} className="flex items-center justify-between gap-2">
-              <span className="text-sm text-neutral-800">{holder.display_name}</span>
+              <span className="text-[13px] text-[var(--ink)]">{holder.display_name}</span>
               {office.can_release ? (
                 <Button
                   size="small"
@@ -294,18 +292,18 @@ function MemberPicker({
   })
 
   return (
-    <div className="mt-3 border-t border-neutral-100 pt-3">
+    <div className="mt-3 border-t border-[var(--line)] pt-3">
       <TextField
         label="从在册成员中选择"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
       />
-      <ul className="mt-2 divide-y divide-neutral-100">
+      <ul className="mt-2 divide-y divide-[var(--line)]">
         {(membersQuery.data?.items ?? []).map((member) => (
           <li key={member.user_id} className="flex items-center justify-between gap-2 py-2">
             <div>
-              <p className="text-sm text-neutral-900">{member.display_name}</p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-[13px] text-[var(--ink)]">{member.display_name}</p>
+              <p className="text-xs text-[var(--ink-faint)]">
                 {member.departments.map((item) => `${item.name_zh}${item.role_name_zh}`).join('、') ||
                   '尚未任职'}
               </p>

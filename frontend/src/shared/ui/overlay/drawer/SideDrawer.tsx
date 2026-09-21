@@ -10,12 +10,6 @@ export interface SideDrawerProps {
   children: ReactNode
 }
 
-/**
- * A modal panel anchored to the trailing edge, used where a record's history should stay beside
- * the list it belongs to instead of replacing it.
- *
- * 贴靠右侧的模态面板，用于在不离开列表的情况下查看某条记录的历史。
- */
 export function SideDrawer({
   isOpen,
   title,
@@ -32,21 +26,21 @@ export function SideDrawer({
       aria-labelledby={titleId}
       className="ml-auto h-full max-h-none w-full max-w-md"
     >
-      <div className="flex h-full flex-col border-l border-neutral-200 bg-white">
-        <header className="flex items-start justify-between gap-4 border-b border-neutral-200 px-5 py-4">
+      <div className="flex h-full flex-col border-l border-[var(--line)] bg-white">
+        <header className="flex items-start justify-between gap-4 border-b border-[var(--line)] px-4 py-3">
           <div className="min-w-0">
-            <h2 id={titleId} className="text-base font-semibold text-neutral-900">
+            <h2 id={titleId} className="text-[13px] font-semibold text-[var(--ink)]">
               {title}
             </h2>
             {description !== undefined ? (
-              <p className="mt-1 text-sm text-neutral-500">{description}</p>
+              <p className="mt-0.5 text-xs text-[var(--ink-muted)]">{description}</p>
             ) : null}
           </div>
           <Button variant="ghost" size="small" onClick={onDismiss} aria-label="关闭面板">
             关闭
           </Button>
         </header>
-        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        <div className="flex-1 overflow-y-auto px-4 py-3">{children}</div>
       </div>
     </dialog>
   )

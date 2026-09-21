@@ -251,7 +251,7 @@ function MemberPlacementRow({
   onRemove: (membershipId: string) => void
 }) {
   return (
-    <li className={isSelected ? 'bg-[var(--portal-accent-soft)]' : undefined}>
+    <li className={isSelected ? 'bg-[var(--brand-soft)]' : undefined}>
       <button type="button" className="w-full px-3 py-3 text-left" onClick={onSelect}>
         <p className="text-sm font-medium text-neutral-900">{member.display_name}</p>
         <p className="text-xs text-neutral-500">

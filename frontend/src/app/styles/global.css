@@ -1,10 +1,30 @@
 @import 'tailwindcss';
 
 :root {
-  --portal-accent: #8c1d40;
-  --portal-accent-strong: #6f1633;
-  --portal-accent-soft: #f6e8ed;
-  --portal-accent-border: #e3c3ce;
+  --ink: #12141a;
+  --ink-muted: #5e6573;
+  --ink-faint: #8b929e;
+  --paper: #eceef2;
+  --surface: #ffffff;
+  --line: #d5d9e0;
+  --line-strong: #b8bec8;
+  --brand: #002a5c;
+  --brand-hover: #001e42;
+  --brand-soft: #e7edf4;
+  --danger: #b42318;
+  --danger-soft: #f8e8e6;
+  --ok: #0f6b4c;
+  --sidebar: #0b1020;
+  --sidebar-hover: #151b2e;
+  --sidebar-active: #1c2540;
+  --sidebar-text: #9aa3b5;
+  --sidebar-text-active: #f4f6f8;
+  --radius: 2px;
+
+  --portal-accent: #002a5c;
+  --portal-accent-strong: #001e42;
+  --portal-accent-soft: #e7edf4;
+  --portal-accent-border: #b7c4d4;
   --portal-accent-contrast: #ffffff;
   color-scheme: light;
 }
@@ -18,13 +38,23 @@ body,
 body {
   margin: 0;
   font-family:
-    'Segoe UI',
+    'IBM Plex Sans',
+    'Noto Sans SC',
     'PingFang SC',
     'Microsoft YaHei',
-    'Noto Sans SC',
     sans-serif;
-  background: #f5f5f4;
-  color: #171717;
+  font-size: 13px;
+  line-height: 1.5;
+  background: var(--paper);
+  color: var(--ink);
+  font-feature-settings: 'ss03' 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 dialog {
@@ -33,6 +63,16 @@ dialog {
   background: transparent;
 }
 
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
 dialog::backdrop {
-  background: rgb(23 23 23 / 0.45);
+  background: rgb(12 16 32 / 0.52);
+}
+
+::selection {
+  background: #c5d0de;
+  color: var(--ink);
 }

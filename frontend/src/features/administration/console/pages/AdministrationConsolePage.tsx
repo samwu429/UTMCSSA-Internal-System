@@ -61,9 +61,8 @@ export function AdministrationConsolePage() {
   return (
     <div className="space-y-6">
       <PageHeading
-        title="主席团管理后台"
-        englishTitle="Presidium console"
-        description="给非技术人员使用：审批新成员、安排部门、分配权限集合。每一项都用中文说明这个人能做什么。"
+        title="管理"
+        description="审批、任职、权限与部门结构。"
       />
 
       <SegmentedNavigation

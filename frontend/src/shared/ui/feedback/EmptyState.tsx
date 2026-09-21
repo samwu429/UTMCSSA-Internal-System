@@ -8,10 +8,10 @@ export interface EmptyStateProps {
 
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-2 py-6 text-center">
-      <p className="text-sm font-medium text-neutral-700">{title}</p>
+    <div className="flex flex-col items-start gap-1 py-5">
+      <p className="text-[13px] text-[var(--ink)]">{title}</p>
       {description !== undefined ? (
-        <p className="max-w-md text-xs text-neutral-500">{description}</p>
+        <p className="max-w-md text-xs text-[var(--ink-muted)]">{description}</p>
       ) : null}
       {action !== undefined ? <div className="mt-2">{action}</div> : null}
     </div>

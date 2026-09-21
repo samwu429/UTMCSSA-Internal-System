@@ -10,7 +10,7 @@ export interface SignOutButtonProps {
   size?: ButtonSize
 }
 
-export function SignOutButton({ variant = 'secondary', size = 'small' }: SignOutButtonProps) {
+export function SignOutButton({ variant = 'ghost', size = 'small' }: SignOutButtonProps) {
   const { signOut } = useSession()
   const navigate = useNavigate()
   const [isSigningOut, setIsSigningOut] = useState(false)
@@ -29,7 +29,7 @@ export function SignOutButton({ variant = 'secondary', size = 'small' }: SignOut
         })
       }}
     >
-      退出登录
+      退出
     </Button>
   )
 }

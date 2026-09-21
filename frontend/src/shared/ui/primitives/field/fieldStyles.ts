@@ -1,12 +1,13 @@
-export const fieldLabelClassName = 'block text-sm font-medium text-neutral-800'
+export const fieldLabelClassName = 'block text-xs font-medium text-[var(--ink-muted)]'
 
 export const fieldControlClassName =
-  'mt-1.5 block w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm ' +
-  'text-neutral-900 placeholder:text-neutral-400 disabled:bg-neutral-100 ' +
-  'disabled:text-neutral-500'
+  'mt-1 block h-8 w-full rounded-[var(--radius)] border border-[var(--line-strong)] bg-white ' +
+  'px-2.5 text-[13px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] ' +
+  'disabled:bg-[var(--paper)] disabled:text-[var(--ink-faint)] focus:border-[var(--brand)] ' +
+  'focus:outline-none'
 
-export const fieldControlInvalidClassName = 'border-red-400'
+export const fieldControlInvalidClassName = 'border-[var(--danger)]'
 
-export const fieldHintClassName = 'mt-1 text-xs text-neutral-500'
+export const fieldHintClassName = 'mt-1 text-xs text-[var(--ink-faint)]'
 
-export const fieldErrorClassName = 'mt-1 text-xs text-red-700'
+export const fieldErrorClassName = 'mt-1 text-xs text-[var(--danger)]'

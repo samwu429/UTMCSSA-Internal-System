@@ -257,7 +257,7 @@ function RoleEditorDialog({
           onChange={(event) => setScope(event.target.value)}
         />
         {catalog.groups.map((group) => (
-          <fieldset key={group.key} className="rounded-lg border border-neutral-200 px-4 py-3">
+          <fieldset key={group.key} className="border border-[var(--line)] px-3 py-2.5">
             <legend className="px-1 text-sm font-medium text-neutral-900">{group.label_zh}</legend>
             <div className="mt-2 space-y-2">
               {group.options.map((option) => (

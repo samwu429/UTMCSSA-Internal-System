@@ -4,12 +4,12 @@ export interface LoadingPanelProps {
 
 export function LoadingPanel({ label = '正在加载…' }: LoadingPanelProps) {
   return (
-    <div className="flex items-center justify-center gap-3 py-10" role="status">
+    <div className="flex items-center gap-2 py-8" role="status">
       <span
         aria-hidden
-        className="size-4 animate-spin rounded-full border-2 border-neutral-300 border-t-[var(--portal-accent)]"
+        className="size-3.5 animate-spin rounded-full border border-[var(--line-strong)] border-t-[var(--brand)]"
       />
-      <span className="text-sm text-neutral-500">{label}</span>
+      <span className="text-[13px] text-[var(--ink-muted)]">{label}</span>
     </div>
   )
 }

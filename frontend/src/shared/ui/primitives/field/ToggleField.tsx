@@ -28,11 +28,11 @@ export function ToggleField({
   return (
     <div className="flex items-start justify-between gap-6 py-3">
       <div className="min-w-0">
-        <label htmlFor={controlId} className="block text-sm font-medium text-neutral-900">
+        <label htmlFor={controlId} className="block text-[13px] font-medium text-[var(--ink)]">
           {label}
         </label>
         {description !== undefined ? (
-          <p id={descriptionId} className="mt-1 text-xs text-neutral-500">
+          <p id={descriptionId} className="mt-1 text-xs text-[var(--ink-muted)]">
             {description}
           </p>
         ) : null}
@@ -40,7 +40,7 @@ export function ToggleField({
       <span
         className={composeClassNames(
           'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors',
-          checked ? 'bg-[var(--portal-accent)]' : 'bg-neutral-300',
+          checked ? 'bg-[var(--brand)]' : 'bg-[#c5cad3]',
           disabled && 'opacity-50',
         )}
       >

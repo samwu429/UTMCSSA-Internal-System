@@ -8,11 +8,11 @@ export interface ErrorNoticeProps {
 
 export function ErrorNotice({ error, onRetry }: ErrorNoticeProps) {
   return (
-    <div className="flex flex-col items-center gap-3 py-8 text-center" role="alert">
-      <p className="text-sm text-neutral-800">{resolveErrorMessage(error)}</p>
+    <div className="flex flex-col items-start gap-2 py-6" role="alert">
+      <p className="text-[13px] text-[var(--ink)]">{resolveErrorMessage(error)}</p>
       {onRetry !== undefined ? (
         <Button size="small" onClick={onRetry}>
-          重新加载
+          重试
         </Button>
       ) : null}
     </div>

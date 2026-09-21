@@ -2,9 +2,9 @@ import type { ToastMessage, ToastTone } from '@/app/providers/notifications/toas
 import { composeClassNames } from '@/shared/ui/styling/composeClassNames'
 
 const toneClassNames: Record<ToastTone, string> = {
-  informational: 'border-neutral-300 bg-white text-neutral-800',
-  success: 'border-emerald-300 bg-emerald-50 text-emerald-900',
-  failure: 'border-red-300 bg-red-50 text-red-900',
+  informational: 'border-[var(--line-strong)] bg-white text-[var(--ink)]',
+  success: 'border-[#9dcdc0] bg-[#eef6f3] text-[#0f6b4c]',
+  failure: 'border-[#e2b4ae] bg-[var(--danger-soft)] text-[var(--danger)]',
 }
 
 export interface ToastViewportProps {
@@ -24,17 +24,17 @@ export function ToastViewport({ messages, onDismiss }: ToastViewportProps) {
           key={message.id}
           role={message.tone === 'failure' ? 'alert' : 'status'}
           className={composeClassNames(
-            'pointer-events-auto flex w-full max-w-md items-start justify-between gap-4 rounded-md border px-4 py-3 shadow-sm',
+            'pointer-events-auto flex w-full max-w-sm items-start justify-between gap-4 border px-3 py-2.5',
             toneClassNames[message.tone],
           )}
         >
-          <p className="text-sm break-words">{message.text}</p>
+          <p className="text-[13px] break-words">{message.text}</p>
           <button
             type="button"
             onClick={() => {
               onDismiss(message.id)
             }}
-            className="shrink-0 text-xs text-neutral-500 hover:text-neutral-800"
+            className="shrink-0 text-xs text-[var(--ink-faint)] hover:text-[var(--ink)]"
           >
             关闭
           </button>

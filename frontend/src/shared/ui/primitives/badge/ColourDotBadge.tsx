@@ -19,7 +19,7 @@ export function ColourDotBadge({ colour, className, children }: ColourDotBadgePr
   return (
     <span
       className={composeClassNames(
-        'inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-2 py-0.5 text-xs text-neutral-700 whitespace-nowrap',
+        'inline-flex items-center gap-1.5 rounded-[var(--radius)] border border-[var(--line)] bg-white px-1.5 py-px text-[11px] text-[var(--ink)] whitespace-nowrap',
         className,
       )}
     >

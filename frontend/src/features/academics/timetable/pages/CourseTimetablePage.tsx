@@ -13,15 +13,11 @@ export function CourseTimetablePage() {
 
   return (
     <div className="space-y-6">
-      <PageHeading
-        title="学术支持与课表"
-        englishTitle="Academic"
-        description="把本学期课程写进系统后，每天早晨的邮件会带上当天课程、社团活动、天气和日期。"
-      />
+      <PageHeading title="学术" description="本学期课表；晨间邮件会带上当天课程与活动。" />
 
-      <Panel title="今日邮件预览" description="与明天早上会发出的摘要相同。">
+      <Panel title="今日邮件预览">
         {digestQuery.data === undefined ? (
-          <p className="text-sm text-neutral-500">正在生成预览…</p>
+          <p className="text-[13px] text-[var(--ink-faint)]">载入中…</p>
         ) : (
           <div className="space-y-2 text-sm text-neutral-700">
             <p>

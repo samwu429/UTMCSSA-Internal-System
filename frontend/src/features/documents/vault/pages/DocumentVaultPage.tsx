@@ -218,9 +218,8 @@ export function DocumentVaultPage({
     <div className="space-y-6">
       {hideHeading ? null : (
         <PageHeading
-          title={`${portal.name_zh}文件库`}
-          englishTitle="Document vault"
-          description="社团管理文件与策划类文件按分类存放。进入后看到的是本部门自己的归档树。"
+          title="文件"
+          description="按分类存放本部门文件。"
         />
       )}
 
@@ -228,10 +227,10 @@ export function DocumentVaultPage({
         <Panel title="分类" description="治理文件、策划方案与财务材料分开存放。">
           <button
             type="button"
-            className={`mb-2 block w-full rounded-md px-3 py-2 text-left text-sm ${
+            className={`mb-2 block w-full px-3 py-2 text-left text-[13px] ${
               resolvedCategoryId === ''
-                ? 'bg-[var(--portal-accent-soft)] text-[var(--portal-accent-strong)]'
-                : 'hover:bg-neutral-50'
+                ? 'bg-[var(--brand-soft)] text-[var(--brand)]'
+                : 'hover:bg-[var(--paper)]'
             }`}
             onClick={() => {
               setSelectedCategoryId('')
@@ -373,10 +372,10 @@ function CategoryTree({
         <li key={node.id}>
           <button
             type="button"
-            className={`block w-full rounded-md px-3 py-2 text-left text-sm ${
+            className={`block w-full px-3 py-2 text-left text-[13px] ${
               selectedId === node.id
-                ? 'bg-[var(--portal-accent-soft)] text-[var(--portal-accent-strong)]'
-                : 'hover:bg-neutral-50'
+                ? 'bg-[var(--brand-soft)] text-[var(--brand)]'
+                : 'hover:bg-[var(--paper)]'
             }`}
             style={{ paddingLeft: `${12 + depth * 12}px` }}
             onClick={() => {

@@ -121,9 +121,8 @@ export function MemberDirectoryPage() {
   return (
     <div className="space-y-6">
       <PageHeading
-        title={portal.has_organization_oversight ? '全社成员名录' : `${portal.name_zh}成员名录`}
-        englishTitle="Member directory"
-        description="按毕业年份、在校或毕业身份查找成员。联系方式仅对有权限的账号显示。"
+        title={portal.has_organization_oversight ? '全社名录' : '名录'}
+        description="按毕业年份与身份查找。联系方式仅对有权限的账号显示。"
         actions={
           isPermitted(Permission.DIRECTORY_EXPORT) ? (
             <Button

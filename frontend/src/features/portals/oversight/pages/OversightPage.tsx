@@ -37,7 +37,7 @@ export function OversightPage() {
       <PageHeading
         title="跨部门监管"
         englishTitle="Oversight"
-        description="主席团和行政部从这里查看全社数据。各部门自己的页面不会出现这些汇总，以免打破「各部独立系统」的使用感受。"
+        description="全社成员、部门与活动汇总。"
       />
 
       <QueryStateBoundary

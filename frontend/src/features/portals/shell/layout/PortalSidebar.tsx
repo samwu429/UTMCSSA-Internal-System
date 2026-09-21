@@ -10,14 +10,24 @@ export function PortalSidebar() {
   const items = buildPortalNavigation(departmentSlug, portal.portal_modules, permissions)
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-neutral-200 bg-white">
-      <div className="border-b border-neutral-200 px-5 py-5">
-        <p className="text-[11px] tracking-wide text-neutral-400 uppercase">UTMCSSA</p>
-        <p className="mt-1 text-base font-semibold text-neutral-900">{portal.name_zh}</p>
-        <p className="text-xs text-neutral-500">{portal.name_en}</p>
+    <aside className="flex w-[212px] shrink-0 flex-col bg-[var(--sidebar)] text-[var(--sidebar-text)]">
+      <div className="flex items-center gap-2.5 px-4 py-4">
+        <span
+          aria-hidden
+          className="size-2 shrink-0"
+          style={{ backgroundColor: portal.accent_color }}
+        />
+        <div className="min-w-0">
+          <p className="truncate text-[13px] font-medium text-[var(--sidebar-text-active)]">
+            {portal.name_zh}
+          </p>
+          <p className="truncate font-mono text-[10px] tracking-wide text-[var(--sidebar-text)]">
+            UTMCSSA
+          </p>
+        </div>
       </div>
 
-      <nav aria-label="部门功能" className="flex flex-1 flex-col gap-0.5 px-3 py-3">
+      <nav aria-label="部门功能" className="flex flex-1 flex-col px-2 pb-4">
         {items.map((item) => (
           <NavLink
             key={item.id}
@@ -25,15 +35,14 @@ export function PortalSidebar() {
             end={item.to === `/portal/${departmentSlug}`}
             className={({ isActive }) =>
               composeClassNames(
-                'rounded-md px-3 py-2 text-sm transition-colors',
+                'flex h-8 items-center px-2.5 text-[13px]',
                 isActive
-                  ? 'bg-[var(--portal-accent-soft)] font-medium text-[var(--portal-accent-strong)]'
-                  : 'text-neutral-700 hover:bg-neutral-50',
+                  ? 'bg-[var(--sidebar-active)] text-[var(--sidebar-text-active)]'
+                  : 'hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text-active)]',
               )
             }
           >
-            <span>{item.label}</span>
-            <span className="ml-2 text-xs text-neutral-400">{item.englishLabel}</span>
+            {item.label}
           </NavLink>
         ))}
       </nav>

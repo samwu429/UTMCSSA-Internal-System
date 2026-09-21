@@ -10,7 +10,7 @@ export function TextualLink({ to, children }: TextualLinkProps) {
   return (
     <Link
       to={to}
-      className="font-medium text-[var(--portal-accent)] underline underline-offset-2 hover:text-[var(--portal-accent-strong)]"
+      className="font-medium text-[var(--brand)] underline underline-offset-2 hover:text-[var(--brand-hover)]"
     >
       {children}
     </Link>

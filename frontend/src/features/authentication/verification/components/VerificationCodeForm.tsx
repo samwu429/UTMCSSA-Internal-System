@@ -113,7 +113,7 @@ export function VerificationCodeForm() {
 
       {noticeMessage !== null ? (
         <p
-          className="rounded-md border border-neutral-300 bg-neutral-50 px-3 py-2 text-sm text-neutral-700"
+          className="border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-[13px] text-[var(--ink)]"
           role="status"
         >
           {noticeMessage}
@@ -122,7 +122,7 @@ export function VerificationCodeForm() {
 
       {failureMessage !== null ? (
         <p
-          className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800"
+          className="border border-[#e2b4ae] bg-[var(--danger-soft)] px-3 py-2 text-[13px] text-[var(--danger)]"
           role="alert"
         >
           {failureMessage}

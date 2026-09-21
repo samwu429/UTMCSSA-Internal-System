@@ -13,7 +13,6 @@ import { fetchAnnouncements } from '@/shared/api/endpoints/activities/announceme
 import { fetchDocumentPage } from '@/shared/api/endpoints/documents/documentEndpoints'
 import { fetchMemberPage } from '@/shared/api/endpoints/directory/memberEndpoints'
 import { formatDateTime } from '@/shared/formatting/dateTime/formatDateTime'
-import { Button } from '@/shared/ui/primitives/button/Button'
 import { PageHeading } from '@/shared/ui/primitives/surface/PageHeading'
 import { Panel } from '@/shared/ui/primitives/surface/Panel'
 import { StatisticTile } from '@/shared/ui/primitives/statistic/StatisticTile'
@@ -44,78 +43,75 @@ export function DepartmentOverviewPage() {
   })
 
   return (
-    <div className="space-y-6">
-      <PageHeading
-        title={copy.headline}
-        englishTitle={portal.name_en}
-        description={`${copy.focus} ${copy.firstAction}`}
-      />
+    <div className="space-y-4">
+      <PageHeading title={copy.headline} description={copy.focus} />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-px border border-[var(--line)] bg-[var(--line)] sm:grid-cols-2 xl:grid-cols-4">
         <StatisticTile
-          label="本页成员"
+          label="成员"
           value={membersQuery.data?.total ?? department?.member_count ?? '—'}
-          caption={profile.affiliation === 'alumnus' ? '含校友联络人' : '含在校成员'}
+          caption={profile.affiliation === 'alumnus' ? '含校友' : '在册'}
         />
-        <StatisticTile
-          label="近期活动"
-          value={activitiesQuery.data?.length ?? '—'}
-          caption="日历中可见的活动"
-        />
-        <StatisticTile
-          label="文件"
-          value={documentsQuery.data?.total ?? '—'}
-          caption="当前分类下可打开的文档"
-        />
+        <StatisticTile label="活动" value={activitiesQuery.data?.length ?? '—'} />
+        <StatisticTile label="文件" value={documentsQuery.data?.total ?? '—'} />
         <StatisticTile
           label="毕业年份"
           value={profile.graduation_year ?? '—'}
-          caption={profile.program_of_study ?? '未填写专业'}
+          caption={profile.program_of_study ?? undefined}
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title="部门公告" description="本部门与面向全社的通知。">
-          <ul className="space-y-3">
-            {(announcementsQuery.data ?? []).slice(0, 4).map((item) => (
-              <li key={item.id}>
-                <p className="text-sm font-medium text-neutral-900">{item.title}</p>
-                <p className="mt-0.5 text-xs text-neutral-500">
-                  {item.author_name ?? '未署名'} · {formatDateTime(item.published_at)}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Panel
+          title="公告"
+          actions={
+            <Link
+              to={routePaths.portalSection(portal.slug, portalSegments.announcements)}
+              className="text-xs text-[var(--ink-muted)] hover:text-[var(--ink)]"
+            >
+              全部
+            </Link>
+          }
+        >
+          <ul className="divide-y divide-[var(--line)]">
+            {(announcementsQuery.data ?? []).slice(0, 5).map((item) => (
+              <li key={item.id} className="flex items-baseline justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                <p className="truncate text-[13px] text-[var(--ink)]">{item.title}</p>
+                <p className="shrink-0 font-mono text-[11px] text-[var(--ink-faint)]">
+                  {formatDateTime(item.published_at)}
                 </p>
               </li>
             ))}
           </ul>
           {(announcementsQuery.data ?? []).length === 0 ? (
-            <p className="text-sm text-neutral-500">暂时没有公告。</p>
+            <p className="text-[13px] text-[var(--ink-faint)]">无</p>
           ) : null}
-          <div className="mt-4">
-            <Link to={routePaths.portalSection(portal.slug, portalSegments.announcements)}>
-              <Button size="small">查看全部公告</Button>
-            </Link>
-          </div>
         </Panel>
 
-        <Panel title="即将到来的活动" description="发布后会出现在每日邮件摘要里。">
-          <ul className="space-y-3">
-            {(activitiesQuery.data ?? []).slice(0, 4).map((item) => (
-              <li key={item.id}>
-                <p className="text-sm font-medium text-neutral-900">{item.title}</p>
-                <p className="mt-0.5 text-xs text-neutral-500">
+        <Panel
+          title="活动"
+          actions={
+            <Link
+              to={routePaths.portalSection(portal.slug, portalSegments.activities)}
+              className="text-xs text-[var(--ink-muted)] hover:text-[var(--ink)]"
+            >
+              日历
+            </Link>
+          }
+        >
+          <ul className="divide-y divide-[var(--line)]">
+            {(activitiesQuery.data ?? []).slice(0, 5).map((item) => (
+              <li key={item.id} className="flex items-baseline justify-between gap-3 py-2 first:pt-0 last:pb-0">
+                <p className="truncate text-[13px] text-[var(--ink)]">{item.title}</p>
+                <p className="shrink-0 font-mono text-[11px] text-[var(--ink-faint)]">
                   {formatDateTime(item.starts_at)}
-                  {item.location != null && item.location !== '' ? ` · ${item.location}` : ''}
                 </p>
               </li>
             ))}
           </ul>
           {(activitiesQuery.data ?? []).length === 0 ? (
-            <p className="text-sm text-neutral-500">近期没有已登记的活动。</p>
+            <p className="text-[13px] text-[var(--ink-faint)]">无</p>
           ) : null}
-          <div className="mt-4">
-            <Link to={routePaths.portalSection(portal.slug, portalSegments.activities)}>
-              <Button size="small">打开活动日历</Button>
-            </Link>
-          </div>
         </Panel>
       </div>
     </div>

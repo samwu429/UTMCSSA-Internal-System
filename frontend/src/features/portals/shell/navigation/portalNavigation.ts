@@ -12,18 +12,18 @@ export interface PortalNavigationItem {
 }
 
 const MODULE_LABELS: Record<string, { label: string; englishLabel: string }> = {
-  overview: { label: '部门主页', englishLabel: 'Home' },
+  overview: { label: '总览', englishLabel: 'Home' },
   announcements: { label: '公告', englishLabel: 'Notices' },
-  department_directory: { label: '成员名录', englishLabel: 'Members' },
-  document_vault: { label: '文件库', englishLabel: 'Files' },
-  activity_calendar: { label: '活动日历', englishLabel: 'Activities' },
-  sponsor_pipeline: { label: '赞助跟进', englishLabel: 'Sponsors' },
-  budget_ledger: { label: '预算台账', englishLabel: 'Budget' },
-  content_calendar: { label: '宣传排期', englishLabel: 'Content' },
-  academic_resources: { label: '学术支持', englishLabel: 'Academic' },
-  alumni_network: { label: '校友网络', englishLabel: 'Alumni' },
-  cross_department_oversight: { label: '跨部门监管', englishLabel: 'Oversight' },
-  admin_console: { label: '管理后台', englishLabel: 'Admin' },
+  department_directory: { label: '名录', englishLabel: 'Members' },
+  document_vault: { label: '文件', englishLabel: 'Files' },
+  activity_calendar: { label: '活动', englishLabel: 'Activities' },
+  sponsor_pipeline: { label: '赞助', englishLabel: 'Sponsors' },
+  budget_ledger: { label: '预算', englishLabel: 'Budget' },
+  content_calendar: { label: '排期', englishLabel: 'Content' },
+  academic_resources: { label: '学术', englishLabel: 'Academic' },
+  alumni_network: { label: '校友', englishLabel: 'Alumni' },
+  cross_department_oversight: { label: '监管', englishLabel: 'Oversight' },
+  admin_console: { label: '管理', englishLabel: 'Admin' },
 }
 
 const MODULE_PERMISSIONS: Record<string, readonly string[]> = {
@@ -95,7 +95,7 @@ export function buildPortalNavigation(
 
   items.push({
     id: 'profile',
-    label: '我的档案',
+    label: '档案',
     englishLabel: 'Profile',
     to: routePaths.portalSection(departmentSlug, portalSegments.profile),
   })

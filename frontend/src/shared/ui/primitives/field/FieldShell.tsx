@@ -41,7 +41,7 @@ export function FieldShell({
     <div className={composeClassNames('w-full', className)}>
       <label htmlFor={controlId} className={fieldLabelClassName}>
         {label}
-        {isRequired ? <span className="ml-1 text-red-600">*</span> : null}
+        {isRequired ? <span className="ml-1 text-[var(--danger)]">*</span> : null}
       </label>
       {children}
       {hint !== undefined ? (

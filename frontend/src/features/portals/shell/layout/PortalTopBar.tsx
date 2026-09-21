@@ -16,7 +16,7 @@ import {
   PRESIDIUM_PRESIDENT_ROLE_KEY,
   officeKeysForDepartment,
 } from '@/shared/organization/offices'
-import { SelectField } from '@/shared/ui/primitives/field/SelectField'
+import { ToolbarSelect } from '@/shared/ui/primitives/field/ToolbarSelect'
 
 export function PortalTopBar() {
   const profile = useAuthenticatedMember()
@@ -74,39 +74,26 @@ export function PortalTopBar() {
     void navigate(routePaths.portalRoot(departmentSlug))
   }
 
+  const statusLine =
+    isPlatformAdministrator && actingLens !== null
+      ? `预览 ${actingLens.department_name_zh}${actingLens.office_name_zh}`
+      : isVisitingForOversight
+        ? `监管 · ${portal.name_zh}`
+        : null
+
   return (
-    <header className="border-b border-neutral-200 bg-white">
-      <div className="h-1.5 w-full" style={{ backgroundColor: portal.accent_color }} />
-      <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-3">
+    <header className="flex h-12 shrink-0 items-center justify-between gap-4 border-b border-[var(--line)] bg-[var(--surface)] px-4">
       <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          <span
-            aria-hidden
-            className="size-2.5 rounded-full"
-            style={{ backgroundColor: portal.accent_color }}
-          />
-          <p className="truncate text-base font-semibold text-neutral-900">{portal.name_zh}系统</p>
-        </div>
-        {isPlatformAdministrator && actingLens !== null ? (
-          <p className="mt-0.5 text-xs text-neutral-500">
-            仅你可见。当前按{actingLens.department_name_zh}
-            {actingLens.office_name_zh}的权限查看。
-          </p>
-        ) : isVisitingForOversight ? (
-          <p className="mt-0.5 text-xs text-neutral-500">
-            已切换到{portal.name_zh}自己的页面。操作按你当前职务权限进行。
-          </p>
-        ) : (
-          <p className="mt-0.5 truncate text-xs text-neutral-500">
-            {portal.summary_zh ?? portal.summary_en}
-          </p>
-        )}
+        <p className="truncate text-[13px] font-medium text-[var(--ink)]">{portal.name_zh}</p>
+        {statusLine !== null ? (
+          <p className="truncate text-[11px] text-[var(--ink-faint)]">{statusLine}</p>
+        ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
         {isPlatformAdministrator && departments.length > 0 ? (
           <>
-            <SelectField
+            <ToolbarSelect
               label="部门"
               value={selectedDepartmentSlug}
               options={departments.map((department) => ({
@@ -120,9 +107,8 @@ export function PortalTopBar() {
                   slug === 'presidium' ? PRESIDIUM_PRESIDENT_ROLE_KEY : preferred
                 applyIdentity(slug, fallback)
               }}
-              containerClassName="min-w-40"
             />
-            <SelectField
+            <ToolbarSelect
               label="职位"
               value={selectedOfficeKey}
               options={offices.map((office) => ({
@@ -132,12 +118,11 @@ export function PortalTopBar() {
               onChange={(event) => {
                 applyIdentity(selectedDepartmentSlug, event.target.value)
               }}
-              containerClassName="min-w-40"
             />
           </>
         ) : switchableDepartments.length > 1 ? (
-          <SelectField
-            label="切换部门系统"
+          <ToolbarSelect
+            label="部门"
             value={portal.slug}
             options={switchableDepartments.map((department) => ({
               value: department.slug,
@@ -146,20 +131,18 @@ export function PortalTopBar() {
             onChange={(event) => {
               void navigate(routePaths.portalRoot(event.target.value))
             }}
-            containerClassName="min-w-52"
           />
         ) : null}
 
-        <div className="text-right">
-          <p className="text-sm font-medium text-neutral-900">
+        <div className="hidden text-right sm:block">
+          <p className="text-[12px] text-[var(--ink)]">
             {actingLens !== null
               ? `${actingLens.department_name_zh}${actingLens.office_name_zh}`
               : profile.display_name}
           </p>
-          <p className="text-xs text-neutral-500">{profile.email}</p>
+          <p className="font-mono text-[10px] text-[var(--ink-faint)]">{profile.email}</p>
         </div>
-        <SignOutButton />
-      </div>
+        <SignOutButton variant="ghost" />
       </div>
     </header>
   )

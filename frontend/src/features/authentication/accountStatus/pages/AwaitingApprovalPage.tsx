@@ -39,39 +39,39 @@ export function AwaitingApprovalPage() {
       }
     >
       <div className="space-y-5">
-        <ol className="space-y-3 text-sm text-neutral-700">
+        <ol className="space-y-3 text-[13px] text-[var(--ink)]">
           <li className="flex gap-3">
-            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-neutral-300 text-xs text-neutral-500">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center border border-[var(--line-strong)] font-mono text-[11px] text-[var(--ink-muted)]">
               1
             </span>
             <span>
-              <span className="font-medium text-neutral-900">提交注册申请</span>
-              <span className="mt-0.5 block text-xs text-neutral-500">已完成</span>
+              <span className="font-medium">提交注册申请</span>
+              <span className="mt-0.5 block text-xs text-[var(--ink-faint)]">已完成</span>
             </span>
           </li>
           <li className="flex gap-3">
-            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-neutral-300 text-xs text-neutral-500">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center border border-[var(--line-strong)] font-mono text-[11px] text-[var(--ink-muted)]">
               2
             </span>
             <span>
-              <span className="font-medium text-neutral-900">验证学校邮箱</span>
-              <span className="mt-0.5 block text-xs text-neutral-500">已完成</span>
+              <span className="font-medium">验证学校邮箱</span>
+              <span className="mt-0.5 block text-xs text-[var(--ink-faint)]">已完成</span>
             </span>
           </li>
           <li className="flex gap-3">
-            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-[var(--portal-accent)] text-xs text-[var(--portal-accent)]">
+            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center border border-[var(--brand)] font-mono text-[11px] text-[var(--brand)]">
               3
             </span>
             <span>
-              <span className="font-medium text-neutral-900">部长或副部长审批入部</span>
-              <span className="mt-0.5 block text-xs text-neutral-500">
-                进行中。您申请加入的部门负责人会在「任职」里看到申请，通过后您将成为该部门部员。
+              <span className="font-medium">部长或副部长审批入部</span>
+              <span className="mt-0.5 block text-xs text-[var(--ink-faint)]">
+                进行中。部门负责人在「任职」中处理，通过后即为部员。
               </span>
             </span>
           </li>
         </ol>
 
-        <div className="rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3 text-xs text-neutral-600">
+        <div className="border border-[var(--line)] bg-[var(--paper)] px-3 py-2.5 text-xs text-[var(--ink-muted)]">
           <p>审批通过后，系统会向您的学校邮箱发送通知邮件，您也可以直接重新登录查看。</p>
           <p className="mt-1">
             如果等待时间较长，请通过日常联络方式联系所在部门的负责人确认申请状态。

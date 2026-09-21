@@ -1,14 +1,12 @@
 export type BadgeTone = 'neutral' | 'accent' | 'positive' | 'caution' | 'critical'
 
 export const badgeBaseClassName =
-  'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs whitespace-nowrap'
+  'inline-flex items-center gap-1 rounded-[var(--radius)] border px-1.5 py-px text-[11px] whitespace-nowrap'
 
 export const badgeToneClassNames: Record<BadgeTone, string> = {
-  neutral: 'border-neutral-300 bg-neutral-50 text-neutral-700',
-  accent:
-    'border-[var(--portal-accent-border)] bg-[var(--portal-accent-soft)] ' +
-    'text-[var(--portal-accent-strong)]',
-  positive: 'border-emerald-300 bg-emerald-50 text-emerald-800',
-  caution: 'border-amber-300 bg-amber-50 text-amber-800',
-  critical: 'border-red-300 bg-red-50 text-red-800',
+  neutral: 'border-[var(--line)] bg-[var(--paper)] text-[var(--ink-muted)]',
+  accent: 'border-[#b7c4d4] bg-[var(--brand-soft)] text-[var(--brand)]',
+  positive: 'border-[#9dcdc0] bg-[#eef6f3] text-[#0f6b4c]',
+  caution: 'border-[#e4c88a] bg-[#f8f1df] text-[#8a5a12]',
+  critical: 'border-[#e2b4ae] bg-[var(--danger-soft)] text-[var(--danger)]',
 }

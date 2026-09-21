@@ -8,9 +8,9 @@ import { composeClassNames } from '@/shared/ui/styling/composeClassNames'
 
 function ruleTone(isActive: boolean, isMet: boolean): string {
   if (!isActive) {
-    return 'text-neutral-600'
+    return 'text-[var(--ink-muted)]'
   }
-  return isMet ? 'text-emerald-800' : 'text-red-700'
+  return isMet ? 'text-[var(--ok)]' : 'text-[var(--danger)]'
 }
 
 function ruleMark(isActive: boolean, isMet: boolean): string {
@@ -44,7 +44,7 @@ export function PasswordRequirements({
 
   return (
     <div className={composeClassNames('space-y-1.5 text-xs', className)}>
-      <p className="font-medium text-neutral-700">密码要求</p>
+      <p className="font-medium text-[var(--ink)]">密码要求</p>
       <ul className="space-y-1">
         <li className={ruleTone(isActive, lengthMet)}>
           {ruleMark(isActive, lengthMet)} · 长度 {MINIMUM_PASSWORD_LENGTH} 到 {MAXIMUM_PASSWORD_LENGTH}{' '}
@@ -52,7 +52,7 @@ export function PasswordRequirements({
         </li>
         <li className={ruleTone(isActive, varietyMet)}>
           {ruleMark(isActive, varietyMet)} · 至少混合下列两类字符
-          <ul className="mt-1 space-y-0.5 pl-4 text-neutral-600">
+          <ul className="mt-1 space-y-0.5 pl-4 text-[var(--ink-muted)]">
             <li className={ruleTone(isActive, classes.lowercase)}>
               {ruleMark(isActive, classes.lowercase)} · 小写字母（a-z）
             </li>

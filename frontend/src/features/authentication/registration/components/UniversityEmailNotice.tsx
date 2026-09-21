@@ -11,21 +11,12 @@ import {
  */
 export function UniversityEmailNotice() {
   return (
-    <div className="rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3">
-      <p className="text-sm font-medium text-neutral-900">仅接受多伦多大学邮箱注册</p>
-      <ul className="mt-2 space-y-1 text-xs text-neutral-600">
-        <li>
-          在校生：
-          {STUDENT_EMAIL_DOMAINS.map((domain) => `@${domain}`).join('、')}
-        </li>
-        <li>
-          毕业生：
-          {ALUMNI_EMAIL_DOMAINS.map((domain) => `@${domain}`).join('、')}
-        </li>
+    <div className="border border-[var(--line)] bg-[var(--paper)] px-3 py-2.5">
+      <p className="text-[13px] font-medium text-[var(--ink)]">仅接受多伦多大学邮箱</p>
+      <ul className="mt-1.5 space-y-1 font-mono text-[11px] text-[var(--ink-muted)]">
+        <li>在校生 {STUDENT_EMAIL_DOMAINS.map((domain) => `@${domain}`).join(' ')}</li>
+        <li>毕业生 {ALUMNI_EMAIL_DOMAINS.map((domain) => `@${domain}`).join(' ')}</li>
       </ul>
-      <p className="mt-2 text-xs text-neutral-500">
-        系统会根据邮箱域名自动判断您是在校生还是毕业生。其他邮箱地址无法完成注册。
-      </p>
     </div>
   )
 }

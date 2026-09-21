@@ -8,7 +8,7 @@ export function RegistrationPage() {
     <AuthenticationLayout
       title="注册申请"
       englishTitle="Register"
-      description="提交后系统会向您的学校邮箱发送验证码。完成邮箱验证后，主席团会为您安排部门归属。"
+      description="提交后向学校邮箱发送验证码。验证完成后由部长或副部长审批入部。"
       footer={
         <span>
           已有账号？<TextualLink to={routePaths.login}>返回登录</TextualLink>

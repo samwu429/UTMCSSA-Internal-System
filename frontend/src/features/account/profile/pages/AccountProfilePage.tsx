@@ -79,7 +79,7 @@ export function AccountProfilePage() {
   return (
     <div className="space-y-6">
       <PageHeading
-        title="我的档案"
+        title="档案"
         englishTitle="Profile"
         description={`${affiliationLabels[profile.affiliation]} · ${profile.email}`}
       />

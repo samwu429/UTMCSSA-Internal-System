@@ -3,7 +3,6 @@ import { composeClassNames } from '@/shared/ui/styling/composeClassNames'
 export interface SegmentedNavigationItem {
   id: string
   label: string
-  /** Rendered as a small count beside the label, for example a pending-approval backlog. */
   badgeCount?: number
 }
 
@@ -24,7 +23,7 @@ export function SegmentedNavigation({
     <div
       role="tablist"
       aria-label={label}
-      className="flex flex-wrap gap-1 border-b border-neutral-200"
+      className="flex flex-wrap gap-0 border-b border-[var(--line)]"
     >
       {items.map((item) => {
         const isActive = item.id === activeItemId
@@ -38,15 +37,15 @@ export function SegmentedNavigation({
               onSelect(item.id)
             }}
             className={composeClassNames(
-              '-mb-px flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-sm transition-colors',
+              '-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-[13px]',
               isActive
-                ? 'border-[var(--portal-accent)] font-medium text-[var(--portal-accent-strong)]'
-                : 'border-transparent text-neutral-600 hover:text-neutral-900',
+                ? 'border-[var(--brand)] font-medium text-[var(--brand)]'
+                : 'border-transparent text-[var(--ink-muted)] hover:text-[var(--ink)]',
             )}
           >
             {item.label}
             {item.badgeCount !== undefined && item.badgeCount > 0 ? (
-              <span className="rounded-full bg-[var(--portal-accent-soft)] px-1.5 py-0.5 text-xs text-[var(--portal-accent-strong)]">
+              <span className="bg-[var(--brand-soft)] px-1.5 py-px font-mono text-[11px] text-[var(--brand)]">
                 {item.badgeCount}
               </span>
             ) : null}

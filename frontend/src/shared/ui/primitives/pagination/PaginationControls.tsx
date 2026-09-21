@@ -20,9 +20,9 @@ export function PaginationControls({
   return (
     <nav
       aria-label="分页导航"
-      className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 px-5 py-3"
+      className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line)] px-4 py-2.5"
     >
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-[var(--ink-muted)]">
         第 {firstRowIndex} - {lastRowIndex} 条，共 {total} 条
       </p>
       <div className="flex items-center gap-2">
@@ -35,7 +35,7 @@ export function PaginationControls({
         >
           上一页
         </Button>
-        <span className="text-xs text-neutral-600">
+        <span className="font-mono text-xs text-[var(--ink-muted)]">
           {page} / {pageCount}
         </span>
         <Button

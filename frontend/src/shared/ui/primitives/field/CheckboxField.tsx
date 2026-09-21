@@ -17,7 +17,7 @@ export function CheckboxField({ label, description, ...nativeProps }: CheckboxFi
         id={controlId}
         type="checkbox"
         aria-describedby={description !== undefined ? descriptionId : undefined}
-        className="mt-0.5 size-4 shrink-0 rounded border-neutral-400 accent-[var(--portal-accent)]"
+        className="mt-0.5 size-4 shrink-0 rounded-[var(--radius)] border-[var(--line-strong)] accent-[var(--brand)]"
       />
       <div className="min-w-0">
         <label htmlFor={controlId} className="block text-sm text-neutral-900">

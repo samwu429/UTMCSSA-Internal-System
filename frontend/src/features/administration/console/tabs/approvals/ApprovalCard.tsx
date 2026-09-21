@@ -55,23 +55,23 @@ export function ApprovalCard({
       title={application.legal_name}
       description={`${application.email} · ${affiliationLabels[application.affiliation]} · 毕业年份 ${application.graduation_year ?? '未填'}`}
     >
-      <dl className="mb-4 grid gap-3 text-sm sm:grid-cols-3">
+      <dl className="mb-3 grid gap-3 text-[13px] sm:grid-cols-3">
         <div>
-          <dt className="text-xs text-neutral-500">中文名</dt>
+          <dt className="text-xs text-[var(--ink-muted)]">中文名</dt>
           <dd>{application.chinese_name ?? '—'}</dd>
         </div>
         <div>
-          <dt className="text-xs text-neutral-500">专业</dt>
+          <dt className="text-xs text-[var(--ink-muted)]">专业</dt>
           <dd>{application.program_of_study ?? '—'}</dd>
         </div>
         <div>
-          <dt className="text-xs text-neutral-500">申请时间</dt>
+          <dt className="text-xs text-[var(--ink-muted)]">申请时间</dt>
           <dd>{formatDateTime(application.registered_at)}</dd>
         </div>
       </dl>
 
       {admissionOnly ? (
-        <p className="mb-4 rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+        <p className="mb-3 border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-[13px] text-[var(--ink)]">
           通过后，该成员将进入
           {departments.find((item) => item.slug === application.requested_department_slug)?.name_zh ??
             '所选部门'}
@@ -93,7 +93,7 @@ export function ApprovalCard({
           />
 
           <fieldset className="mt-4">
-            <legend className="mb-2 text-sm font-medium text-neutral-800">这个人能做什么</legend>
+            <legend className="mb-2 text-[13px] font-medium text-[var(--ink)]">职务</legend>
             <div className="grid gap-2 md:grid-cols-2">
               {assignableRoles.map((role) => {
                 const isSelected = role.id === resolvedRoleId
@@ -106,14 +106,14 @@ export function ApprovalCard({
                       setTitleZh(role.name_zh)
                     }}
                     className={composeClassNames(
-                      'rounded-lg border px-3 py-3 text-left transition-colors',
+                      'border px-3 py-2.5 text-left',
                       isSelected
-                        ? 'border-[var(--portal-accent)] bg-[var(--portal-accent-soft)]'
-                        : 'border-neutral-200 hover:border-neutral-300',
+                        ? 'border-[var(--brand)] bg-[var(--brand-soft)]'
+                        : 'border-[var(--line)] hover:border-[var(--line-strong)]',
                     )}
                   >
-                    <p className="text-sm font-medium text-neutral-900">{role.name_zh}</p>
-                    <p className="mt-1 text-xs text-neutral-500">
+                    <p className="text-[13px] font-medium text-[var(--ink)]">{role.name_zh}</p>
+                    <p className="mt-1 text-xs text-[var(--ink-muted)]">
                       {role.description_zh ?? role.description_en ?? role.name_en}
                     </p>
                   </button>

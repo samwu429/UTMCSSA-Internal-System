@@ -155,9 +155,8 @@ export function ActivityCalendarPage({ hideHeading = false }: { hideHeading?: bo
     <div className="space-y-6">
       {hideHeading ? null : (
         <PageHeading
-          title={`${portal.name_zh}活动日历`}
-          englishTitle="Activities"
-          description="发布活动时可同时发送邮件通知。每日摘要也会带上当天的活动、天气和日期。"
+          title="活动"
+          description="发布时可同时发邮件。每日摘要会带上当天活动。"
         />
       )}
 

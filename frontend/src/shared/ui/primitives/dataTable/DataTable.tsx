@@ -31,13 +31,13 @@ export function DataTable<TRow>({
       <table className="w-full border-collapse text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className="border-b border-neutral-200 bg-neutral-50">
+          <tr className="border-b border-[var(--line)] bg-[var(--paper)]">
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
                 className={composeClassNames(
-                  'px-4 py-2.5 text-xs font-medium tracking-wide text-neutral-500',
+                  'px-3 py-2 text-[11px] font-medium text-[var(--ink-muted)]',
                   column.alignment === 'right' ? 'text-right' : 'text-left',
                   column.isSecondary === true && 'hidden lg:table-cell',
                   column.widthClassName,
@@ -53,13 +53,13 @@ export function DataTable<TRow>({
             const rowKey = extractRowKey(row)
             const expanded = renderExpandedRow?.(row)
             return (
-              <tr key={rowKey} className="border-b border-neutral-100 align-top last:border-b-0">
+              <tr key={rowKey} className="border-b border-[var(--line)] align-middle last:border-b-0 hover:bg-[#f7f8fa]">
                 {expanded == null ? (
                   columns.map((column) => (
                     <td
                       key={column.key}
                       className={composeClassNames(
-                        'px-4 py-3 text-neutral-800',
+                        'px-3 py-2 text-[13px] text-[var(--ink)]',
                         column.alignment === 'right' ? 'text-right' : 'text-left',
                         column.isSecondary === true && 'hidden lg:table-cell',
                       )}

@@ -68,7 +68,7 @@ export function SignInForm() {
       />
 
       {failureMessage !== null ? (
-        <p className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">
+        <p className="border border-[#e2b4ae] bg-[var(--danger-soft)] px-3 py-2 text-[13px] text-[var(--danger)]" role="alert">
           {failureMessage}
         </p>
       ) : null}
@@ -85,7 +85,7 @@ export function SignInForm() {
         </Button>
         <Link
           to={routePaths.forgotPassword}
-          className="text-sm text-neutral-600 underline underline-offset-2 hover:text-neutral-900"
+          className="text-[13px] text-[var(--ink-muted)] underline underline-offset-2 hover:text-[var(--ink)]"
         >
           忘记密码
         </Link>
