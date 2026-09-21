@@ -4,6 +4,7 @@ import { resolveLandingPath } from '@/app/routing/guards/resolveLandingPath'
 import { routePaths } from '@/app/routing/routePaths'
 import { useAuthenticatedMember } from '@/features/authentication/session/context/useAuthenticatedMember'
 import { useSession } from '@/features/authentication/session/context/useSession'
+import { isHiddenPlatformAdministrator } from '@/shared/organization/identityCatalog'
 
 /**
  * Keeps a member inside the portal their department owns, unless they hold organization oversight.
@@ -20,7 +21,7 @@ export function PortalMembershipGuard() {
   }
 
   if (!canEnterDepartmentPortal(profile, departmentSlug, actingIdentity)) {
-    if (actingIdentity !== null && profile.is_platform_administrator === true) {
+    if (actingIdentity !== null && isHiddenPlatformAdministrator(profile)) {
       return <Navigate to={routePaths.portalRoot(actingIdentity.departmentSlug)} replace />
     }
     return <Navigate to={resolveLandingPath(profile)} replace />

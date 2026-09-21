@@ -2,6 +2,7 @@ import { ADMINISTRATION_PERMISSIONS } from '@/shared/authorization/permissionEva
 import { Permission } from '@/shared/api/contracts/authorization/permissionIdentifiers'
 import type { SessionProfile } from '@/shared/api/contracts/identity/sessionProfile'
 import type { ActingIdentity } from '@/features/portals/identity/actingIdentity'
+import { isHiddenPlatformAdministrator } from '@/shared/organization/identityCatalog'
 import {
   PLATFORM_ADMIN_DEPARTMENT_SLUG,
   PLATFORM_ADMINISTRATOR_ROLE_KEY,
@@ -31,12 +32,12 @@ export function canEnterDepartmentPortal(
 ): boolean {
   if (departmentSlug === PLATFORM_ADMIN_DEPARTMENT_SLUG) {
     return (
-      profile.is_platform_administrator === true &&
+      isHiddenPlatformAdministrator(profile) &&
       (actingIdentity === null || actingIdentity.officeKey === PLATFORM_ADMINISTRATOR_ROLE_KEY)
     )
   }
 
-  if (profile.is_platform_administrator === true) {
+  if (isHiddenPlatformAdministrator(profile)) {
     if (actingIdentity === null || actingIdentity.officeKey === PLATFORM_ADMINISTRATOR_ROLE_KEY) {
       return true
     }
@@ -63,7 +64,7 @@ export function canOpenEveryDepartmentPortal(
   profile: SessionProfile,
   actingIdentity: ActingIdentity | null = null,
 ): boolean {
-  if (profile.is_platform_administrator === true) {
+  if (isHiddenPlatformAdministrator(profile)) {
     if (actingIdentity === null || actingIdentity.officeKey === PLATFORM_ADMINISTRATOR_ROLE_KEY) {
       return true
     }

@@ -20,6 +20,11 @@ import {
 import { signIn as requestSignIn, signOut as requestSignOut } from '@/shared/api/endpoints/identity/authenticationEndpoints'
 import { fetchSessionProfile } from '@/shared/api/endpoints/identity/sessionEndpoints'
 import { routePaths } from '@/app/routing/routePaths'
+import {
+  findIdentityLens,
+  isHiddenPlatformAdministrator,
+  resolveAdministratorIdentityLenses,
+} from '@/shared/organization/identityCatalog'
 
 const PROFILE_STALE_TIME_MILLISECONDS = 60_000
 
@@ -92,15 +97,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const actingLens = useMemo(() => {
     const profile = profileQuery.data
-    if (profile?.is_platform_administrator !== true || actingIdentity === null) {
+    if (profile == null || !isHiddenPlatformAdministrator(profile) || actingIdentity === null) {
       return null
     }
-    return (
-      profile.identity_lenses?.find(
-        (lens) =>
-          lens.department_slug === actingIdentity.departmentSlug &&
-          lens.office_key === actingIdentity.officeKey,
-      ) ?? null
+    return findIdentityLens(
+      resolveAdministratorIdentityLenses(profile),
+      actingIdentity.departmentSlug,
+      actingIdentity.officeKey,
     )
   }, [actingIdentity, profileQuery.data])
 
