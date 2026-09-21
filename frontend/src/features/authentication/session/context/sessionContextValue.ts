@@ -1,3 +1,5 @@
+import type { ActingIdentity } from '@/features/portals/identity/actingIdentity'
+import type { IdentityLens } from '@/shared/api/contracts/identity/sessionProfile'
 import type { LoginRequest, TokenPair } from '@/shared/api/contracts/identity/authentication'
 import type { SessionProfile } from '@/shared/api/contracts/identity/sessionProfile'
 
@@ -10,6 +12,9 @@ export interface SessionContextValue {
   hasStoredSession: boolean
   permissions: readonly string[]
   isPermitted: (permission: string) => boolean
+  actingIdentity: ActingIdentity | null
+  actingLens: IdentityLens | null
+  setActingIdentity: (identity: ActingIdentity | null) => void
   signIn: (credentials: LoginRequest) => Promise<TokenPair>
   signOut: () => Promise<void>
   reloadProfile: () => void

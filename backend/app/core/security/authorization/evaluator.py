@@ -85,6 +85,11 @@ class AuthorizationContext:
         """True when at least one role applies across the whole association."""
         return bool(self._organization_permissions)
 
+    @property
+    def is_platform_administrator(self) -> bool:
+        """True only for the hidden technical account, which holds system settings."""
+        return Permission.SYSTEM_MANAGE_SETTINGS in self._organization_permissions
+
     def granted_permissions(self) -> frozenset[Permission]:
         """Union of every permission held anywhere; used to drive frontend navigation only."""
         granted: set[Permission] = set(self._organization_permissions)

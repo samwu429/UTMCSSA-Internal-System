@@ -12,6 +12,11 @@ import {
   storeTokenPair,
 } from '@/shared/api/client/credentials/tokenStorage'
 import type { LoginRequest, TokenPair } from '@/shared/api/contracts/identity/authentication'
+import {
+  readActingIdentity,
+  writeActingIdentity,
+  type ActingIdentity,
+} from '@/features/portals/identity/actingIdentity'
 import { signIn as requestSignIn, signOut as requestSignOut } from '@/shared/api/endpoints/identity/authenticationEndpoints'
 import { fetchSessionProfile } from '@/shared/api/endpoints/identity/sessionEndpoints'
 import { routePaths } from '@/app/routing/routePaths'
@@ -22,6 +27,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [hasStoredSession, setHasStoredSession] = useState(() => hasStoredCredentials())
+  const [actingIdentity, setActingIdentityState] = useState<ActingIdentity | null>(() =>
+    readActingIdentity(),
+  )
 
   const profileQuery = useQuery({
     queryKey: sessionQueryKeys.profile(),
@@ -37,6 +45,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(
     () =>
       subscribeToSessionExpiry(() => {
+        writeActingIdentity(null)
+        setActingIdentityState(null)
         setHasStoredSession(false)
         queryClient.clear()
         void navigate(routePaths.login, { replace: true })
@@ -65,17 +75,38 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       // 登出请求失败不应让成员停留在已登录界面；无论结果如何都清除本地凭据，停止继续携带。
     }
     clearStoredTokens()
+    writeActingIdentity(null)
+    setActingIdentityState(null)
     setHasStoredSession(false)
     queryClient.clear()
   }, [queryClient])
+
+  const setActingIdentity = useCallback((identity: ActingIdentity | null) => {
+    writeActingIdentity(identity)
+    setActingIdentityState(identity)
+  }, [])
 
   const reloadProfile = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: sessionQueryKeys.profile() })
   }, [queryClient])
 
+  const actingLens = useMemo(() => {
+    const profile = profileQuery.data
+    if (profile?.is_platform_administrator !== true || actingIdentity === null) {
+      return null
+    }
+    return (
+      profile.identity_lenses?.find(
+        (lens) =>
+          lens.department_slug === actingIdentity.departmentSlug &&
+          lens.office_key === actingIdentity.officeKey,
+      ) ?? null
+    )
+  }, [actingIdentity, profileQuery.data])
+
   const permissions = useMemo<readonly string[]>(
-    () => profileQuery.data?.permissions ?? [],
-    [profileQuery.data],
+    () => actingLens?.permissions ?? profileQuery.data?.permissions ?? [],
+    [actingLens, profileQuery.data],
   )
 
   const value = useMemo<SessionContextValue>(
@@ -86,6 +117,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       hasStoredSession,
       permissions,
       isPermitted: (permission: string) => permissions.includes(permission),
+      actingIdentity,
+      actingLens,
+      setActingIdentity,
       signIn,
       signOut,
       reloadProfile,
@@ -96,6 +130,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       profileQuery.error,
       hasStoredSession,
       permissions,
+      actingIdentity,
+      actingLens,
+      setActingIdentity,
       signIn,
       signOut,
       reloadProfile,

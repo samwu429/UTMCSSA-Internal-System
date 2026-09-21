@@ -13,6 +13,11 @@ import {
 } from '@/shared/api/endpoints/organization/membershipEndpoints'
 import { fetchDepartments } from '@/shared/api/endpoints/organization/departmentEndpoints'
 import { fetchRoles } from '@/shared/api/endpoints/organization/roleEndpoints'
+import type { RoleSummary } from '@/shared/api/contracts/organization/role'
+import {
+  defaultRoleIdForDepartment,
+  rolesAssignableInDepartment,
+} from '@/shared/organization/offices'
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue'
 import { ColourDotBadge } from '@/shared/ui/primitives/badge/ColourDotBadge'
 import { EmptyState } from '@/shared/ui/feedback/EmptyState'
@@ -51,6 +56,9 @@ export function MembershipPlacementPane() {
   })
 
   const selectedMember = membersQuery.data?.items.find((item) => item.user_id === selectedUserId)
+  const selectedDepartmentSlug =
+    (departmentsQuery.data ?? []).find((item) => item.id === departmentId)?.slug ?? ''
+  const assignableRoles = rolesAssignableInDepartment(rolesQuery.data ?? [], selectedDepartmentSlug)
 
   const refreshMembers = async () => {
     await queryClient.invalidateQueries({ queryKey: memberQueryKeys.root })
@@ -173,17 +181,31 @@ export function MembershipPlacementPane() {
               value: item.id,
               label: item.name_zh,
             }))}
-            onChange={(event) => setDepartmentId(event.target.value)}
+            onChange={(event) => {
+              const nextDepartmentId = event.target.value
+              setDepartmentId(nextDepartmentId)
+              const slug =
+                (departmentsQuery.data ?? []).find((item) => item.id === nextDepartmentId)?.slug ??
+                ''
+              const nextRoleId = defaultRoleIdForDepartment(rolesQuery.data ?? [], slug)
+              setRoleId(nextRoleId)
+              const nextRole = (rolesQuery.data ?? []).find((item) => item.id === nextRoleId)
+              setTitleZh(nextRole?.name_zh ?? '')
+            }}
           />
           <SelectField
-            label="权限集合"
+            label="职务"
             value={roleId}
-            placeholderLabel="选择权限"
-            options={(rolesQuery.data ?? []).map((item) => ({
+            placeholderLabel="选择职务"
+            options={assignableRoles.map((item) => ({
               value: item.id,
               label: item.name_zh,
             }))}
-            onChange={(event) => setRoleId(event.target.value)}
+            onChange={(event) => {
+              setRoleId(event.target.value)
+              const nextRole = assignableRoles.find((item) => item.id === event.target.value)
+              setTitleZh(nextRole?.name_zh ?? titleZh)
+            }}
           />
           <TextField
             label="职务称呼"
@@ -222,7 +244,7 @@ function MemberPlacementRow({
 }: {
   member: MemberSummary
   isSelected: boolean
-  roles: readonly { id: string; name_zh: string }[]
+  roles: readonly RoleSummary[]
   onSelect: () => void
   onMarkPrimary: (membershipId: string) => void
   onChangeRole: (membershipId: string, roleId: string) => void
@@ -259,7 +281,7 @@ function MemberPlacementRow({
                 }}
               >
                 <option value="">{badge.role_name_zh}</option>
-                {roles.map((role) => (
+                {rolesAssignableInDepartment(roles, badge.slug).map((role) => (
                   <option key={role.id} value={role.id}>
                     {role.name_zh}
                   </option>

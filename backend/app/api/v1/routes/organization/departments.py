@@ -25,8 +25,7 @@ async def list_departments(
     session: SessionDependency,
     context: ContextDependency,
 ) -> list[DepartmentWithHeadcount]:
-    del context
-    return await department_service.list_departments(session)
+    return await department_service.list_departments(session, context)
 
 
 @router.post("", response_model=DepartmentSummary, status_code=201)
@@ -44,8 +43,7 @@ async def read_department(
     session: SessionDependency,
     context: ContextDependency,
 ) -> DepartmentSummary:
-    del context
-    department = await department_service.get_by_slug(session, slug)
+    department = await department_service.get_by_slug(session, slug, context)
     return DepartmentSummary.model_validate(department)
 
 
@@ -64,8 +62,7 @@ async def read_portal_configuration(
     任何在职成员均可读取，使兼任两个部门的成员无需重新登录即可切换门户；
     返回的仅是展示配置，不包含部门业务数据。
     """
-    del context
-    department = await department_service.get_by_slug(session, slug)
+    department = await department_service.get_by_slug(session, slug, context)
     return to_portal_configuration(department)
 
 

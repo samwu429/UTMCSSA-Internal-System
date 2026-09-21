@@ -19,11 +19,8 @@ from app.core.config.organization.departments import (
     DEPARTMENT_BLUEPRINTS,
     DepartmentBlueprint,
 )
-from app.core.config.organization.role_templates import (
-    PLATFORM_ADMINISTRATOR_ROLE_KEY,
-    ROLE_TEMPLATES,
-    RoleTemplate,
-)
+from app.core.config.organization.offices import PLATFORM_ADMINISTRATOR_ROLE_KEY
+from app.core.config.organization.role_templates import ROLE_TEMPLATES, RoleTemplate
 from app.core.config.settings import get_settings
 from app.core.security.passwords.hashing import hash_password
 from app.domain.documents.models.category import DocumentCategory

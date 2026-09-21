@@ -16,6 +16,10 @@ from sqlalchemy import Select, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config.organization.offices import (
+    PLATFORM_ADMIN_DEPARTMENT_SLUG,
+    PLATFORM_ADMINISTRATOR_ROLE_KEY,
+)
 from app.core.errors.exceptions import PermissionDenied, ResourceNotFound
 from app.core.security.authorization.evaluator import AuthorizationContext
 from app.core.security.authorization.permissions.catalog import Permission
@@ -28,6 +32,7 @@ from app.domain.directory.schemas.member import (
 )
 from app.domain.identity.models.enums import AccountStatus, AffiliationType
 from app.domain.identity.models.user_account import UserAccount
+from app.domain.organization.models.department import Department
 from app.domain.organization.models.membership import DepartmentMembership
 from app.domain.organization.models.role import Role
 
@@ -70,9 +75,31 @@ def _visibility_filter(statement: Select, context: AuthorizationContext) -> Sele
     return statement.where(membership_exists)
 
 
+def _exclude_hidden_administrator(statement: Select, context: AuthorizationContext) -> Select:
+    """Keep the technical account out of every roster other members can see."""
+    if context.is_platform_administrator:
+        return statement
+    hidden = (
+        select(DepartmentMembership.user_id)
+        .join(Department, Department.id == DepartmentMembership.department_id)
+        .join(Role, Role.id == DepartmentMembership.role_id)
+        .where(
+            DepartmentMembership.user_id == UserAccount.id,
+            DepartmentMembership.ended_on.is_(None),
+            or_(
+                Department.slug == PLATFORM_ADMIN_DEPARTMENT_SLUG,
+                Role.key == PLATFORM_ADMINISTRATOR_ROLE_KEY,
+            ),
+        )
+        .exists()
+    )
+    return statement.where(~hidden)
+
+
 def to_summary(
     account: UserAccount, context: AuthorizationContext, *, include_contact: bool
 ) -> MemberSummary:
+    hide_platform_admin = not context.is_platform_administrator
     badges = [
         MemberDepartmentBadge(
             membership_id=membership.id,
@@ -89,6 +116,13 @@ def to_summary(
         )
         for membership in account.memberships
         if membership.is_current
+        and not (
+            hide_platform_admin
+            and (
+                membership.department.slug == PLATFORM_ADMIN_DEPARTMENT_SLUG
+                or membership.role.key == PLATFORM_ADMINISTRATOR_ROLE_KEY
+            )
+        )
     ]
     badges.sort(key=lambda badge: (not badge.is_primary, badge.name_zh))
 
@@ -147,6 +181,7 @@ async def list_members(
 
     statement = select(UserAccount)
     statement = _visibility_filter(statement, context)
+    statement = _exclude_hidden_administrator(statement, context)
     statement = statement.where(
         UserAccount.status.in_(
             [AccountStatus.ACTIVE, AccountStatus.SUSPENDED]
@@ -211,7 +246,10 @@ async def list_members(
 async def get_member(
     session: AsyncSession, context: AuthorizationContext, user_id: UUID
 ) -> MemberDetail:
-    statement = _visibility_filter(select(UserAccount).where(UserAccount.id == user_id), context)
+    statement = _exclude_hidden_administrator(
+        _visibility_filter(select(UserAccount).where(UserAccount.id == user_id), context),
+        context,
+    )
     account = (await session.execute(_with_related(statement))).unique().scalar_one_or_none()
     if account is None:
         raise ResourceNotFound(

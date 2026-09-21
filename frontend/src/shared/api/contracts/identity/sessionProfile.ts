@@ -23,6 +23,16 @@ export interface PortalConfiguration {
   portal_path: string
 }
 
+export interface IdentityLens {
+  department_slug: string
+  department_name_en: string
+  department_name_zh: string
+  office_key: string
+  office_name_en: string
+  office_name_zh: string
+  permissions: string[]
+}
+
 export interface MembershipSummary {
   membership_id: UuidString
   department_id: UuidString
@@ -31,6 +41,7 @@ export interface MembershipSummary {
   department_name_zh: string
   department_accent_color: string
   role_id: UuidString
+  role_key?: string | null
   role_name_en: string
   role_name_zh: string
   role_scope: GrantScope
@@ -61,6 +72,8 @@ export interface SessionProfile {
   memberships: MembershipSummary[]
   primary_portal?: PortalConfiguration | null
   permissions: string[]
+  is_platform_administrator?: boolean
+  identity_lenses?: IdentityLens[]
 
   receives_daily_digest: boolean
   receives_activity_notices: boolean

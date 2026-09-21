@@ -1,14 +1,56 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { routePaths } from '@/app/routing/routePaths'
 import { SignOutButton } from '@/features/authentication/session/components/SignOutButton'
 import { useAuthenticatedMember } from '@/features/authentication/session/context/useAuthenticatedMember'
+import { useSession } from '@/features/authentication/session/context/useSession'
 import { usePortalWorkspace } from '@/features/portals/shell/context/usePortalWorkspace'
+import {
+  DEPARTMENT_DIRECTOR_ROLE_KEY,
+  PLATFORM_ADMINISTRATOR_ROLE_KEY,
+  PRESIDIUM_PRESIDENT_ROLE_KEY,
+  officeKeysForDepartment,
+} from '@/shared/organization/offices'
 import { SelectField } from '@/shared/ui/primitives/field/SelectField'
 
 export function PortalTopBar() {
   const profile = useAuthenticatedMember()
+  const { actingIdentity, actingLens, setActingIdentity } = useSession()
   const { portal, isVisitingForOversight, switchableDepartments } = usePortalWorkspace()
   const navigate = useNavigate()
+  const isPlatformAdministrator = profile.is_platform_administrator === true
+
+  const departments = useMemo(() => {
+    const seen = new Map<string, string>()
+    for (const lens of profile.identity_lenses ?? []) {
+      seen.set(lens.department_slug, lens.department_name_zh)
+    }
+    return [...seen.entries()].map(([slug, name_zh]) => ({ slug, name_zh }))
+  }, [profile.identity_lenses])
+
+  const selectedDepartmentSlug = actingIdentity?.departmentSlug ?? portal.slug
+  const offices = useMemo(
+    () =>
+      (profile.identity_lenses ?? [])
+        .filter((lens) => lens.department_slug === selectedDepartmentSlug)
+        .map((lens) => ({
+          key: lens.office_key,
+          name_zh: lens.office_name_zh,
+        })),
+    [profile.identity_lenses, selectedDepartmentSlug],
+  )
+  const selectedOfficeKey =
+    actingIdentity?.officeKey ??
+    (isPlatformAdministrator && portal.slug === selectedDepartmentSlug
+      ? (offices.find((office) => office.key === PLATFORM_ADMINISTRATOR_ROLE_KEY)?.key ??
+        offices[0]?.key ??
+        '')
+      : (offices[0]?.key ?? ''))
+
+  const applyIdentity = (departmentSlug: string, officeKey: string) => {
+    setActingIdentity({ departmentSlug, officeKey })
+    void navigate(routePaths.portalRoot(departmentSlug))
+  }
 
   return (
     <header className="border-b border-neutral-200 bg-white">
@@ -23,9 +65,14 @@ export function PortalTopBar() {
           />
           <p className="truncate text-base font-semibold text-neutral-900">{portal.name_zh}系统</p>
         </div>
-        {isVisitingForOversight ? (
+        {isPlatformAdministrator && actingLens !== null ? (
           <p className="mt-0.5 text-xs text-neutral-500">
-            已切换到{portal.name_zh}自己的页面。当前账号可使用全部管理权限操作本部门系统。
+            仅你可见。当前按{actingLens.department_name_zh}
+            {actingLens.office_name_zh}的权限查看。
+          </p>
+        ) : isVisitingForOversight ? (
+          <p className="mt-0.5 text-xs text-neutral-500">
+            已切换到{portal.name_zh}自己的页面。操作按你当前职务权限进行。
           </p>
         ) : (
           <p className="mt-0.5 truncate text-xs text-neutral-500">
@@ -35,7 +82,38 @@ export function PortalTopBar() {
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        {switchableDepartments.length > 1 ? (
+        {isPlatformAdministrator && departments.length > 0 ? (
+          <>
+            <SelectField
+              label="部门"
+              value={selectedDepartmentSlug}
+              options={departments.map((department) => ({
+                value: department.slug,
+                label: department.name_zh,
+              }))}
+              onChange={(event) => {
+                const slug = event.target.value
+                const preferred = officeKeysForDepartment(slug)[0] ?? DEPARTMENT_DIRECTOR_ROLE_KEY
+                const fallback =
+                  slug === 'presidium' ? PRESIDIUM_PRESIDENT_ROLE_KEY : preferred
+                applyIdentity(slug, fallback)
+              }}
+              containerClassName="min-w-40"
+            />
+            <SelectField
+              label="职务"
+              value={selectedOfficeKey}
+              options={offices.map((office) => ({
+                value: office.key,
+                label: office.name_zh,
+              }))}
+              onChange={(event) => {
+                applyIdentity(selectedDepartmentSlug, event.target.value)
+              }}
+              containerClassName="min-w-40"
+            />
+          </>
+        ) : switchableDepartments.length > 1 ? (
           <SelectField
             label="切换部门系统"
             value={portal.slug}
@@ -51,7 +129,11 @@ export function PortalTopBar() {
         ) : null}
 
         <div className="text-right">
-          <p className="text-sm font-medium text-neutral-900">{profile.display_name}</p>
+          <p className="text-sm font-medium text-neutral-900">
+            {actingLens !== null
+              ? `${actingLens.department_name_zh}${actingLens.office_name_zh}`
+              : profile.display_name}
+          </p>
           <p className="text-xs text-neutral-500">{profile.email}</p>
         </div>
         <SignOutButton />

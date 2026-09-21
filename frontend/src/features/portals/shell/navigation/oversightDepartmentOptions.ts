@@ -18,5 +18,4 @@ export const OVERSIGHT_DEPARTMENT_OPTIONS: readonly OversightDepartmentOption[] 
   { slug: 'publicity', name_zh: '宣传部' },
   { slug: 'academic', name_zh: '学术部' },
   { slug: 'alumni', name_zh: '毕业生校友' },
-  { slug: 'platform-admin', name_zh: '管理员账户' },
 ]

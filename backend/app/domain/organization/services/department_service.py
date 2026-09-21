@@ -16,6 +16,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config.organization.departments import PortalModule
+from app.core.config.organization.offices import PLATFORM_ADMIN_DEPARTMENT_SLUG
 from app.core.errors.exceptions import PermissionDenied, ResourceConflict, ResourceNotFound
 from app.core.security.authorization.evaluator import AuthorizationContext
 from app.core.security.authorization.permissions.catalog import Permission
@@ -46,7 +47,9 @@ def _validate_modules(modules: list[str]) -> list[str]:
     return modules
 
 
-async def list_departments(session: AsyncSession) -> list[DepartmentWithHeadcount]:
+async def list_departments(
+    session: AsyncSession, context: AuthorizationContext | None = None
+) -> list[DepartmentWithHeadcount]:
     departments = (
         (
             await session.execute(
@@ -72,6 +75,7 @@ async def list_departments(session: AsyncSession) -> list[DepartmentWithHeadcoun
         elif status == AccountStatus.PENDING_APPROVAL:
             pending[department_id] = pending.get(department_id, 0) + count
 
+    hide_platform_admin = context is None or not context.is_platform_administrator
     return [
         DepartmentWithHeadcount(
             **DepartmentSummary.model_validate(department).model_dump(),
@@ -79,14 +83,27 @@ async def list_departments(session: AsyncSession) -> list[DepartmentWithHeadcoun
             pending_count=pending.get(department.id, 0),
         )
         for department in departments
+        if not (hide_platform_admin and department.slug == PLATFORM_ADMIN_DEPARTMENT_SLUG)
     ]
 
 
-async def get_by_slug(session: AsyncSession, slug: str) -> Department:
+async def get_by_slug(
+    session: AsyncSession,
+    slug: str,
+    context: AuthorizationContext | None = None,
+) -> Department:
     department = (
         await session.execute(select(Department).where(Department.slug == slug))
     ).scalar_one_or_none()
     if department is None:
+        raise ResourceNotFound(
+            message_en="That department could not be found.",
+            message_zh="未找到该部门。",
+        )
+    if (
+        department.slug == PLATFORM_ADMIN_DEPARTMENT_SLUG
+        and (context is None or not context.is_platform_administrator)
+    ):
         raise ResourceNotFound(
             message_en="That department could not be found.",
             message_zh="未找到该部门。",

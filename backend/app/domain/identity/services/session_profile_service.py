@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from app.core.config.organization.offices import build_identity_lenses
 from app.core.security.authorization.evaluator import AuthorizationContext
 from app.domain.identity.models.user_account import UserAccount
 from app.domain.identity.schemas.session_profile import (
+    IdentityLens,
     MembershipSummary,
     PortalConfiguration,
     SessionProfile,
@@ -29,6 +31,7 @@ def to_portal_configuration(department: Department) -> PortalConfiguration:
 
 def build(account: UserAccount, context: AuthorizationContext) -> SessionProfile:
     """Identity, affiliations, permissions, and the portal the member lands on."""
+    is_platform_administrator = context.is_platform_administrator
     memberships = [
         MembershipSummary(
             membership_id=membership.id,
@@ -38,6 +41,7 @@ def build(account: UserAccount, context: AuthorizationContext) -> SessionProfile
             department_name_zh=membership.department.name_zh,
             department_accent_color=membership.department.accent_color,
             role_id=membership.role_id,
+            role_key=membership.role.key,
             role_name_en=membership.role.name_en,
             role_name_zh=membership.role.name_zh,
             role_scope=membership.role.scope,
@@ -79,6 +83,12 @@ def build(account: UserAccount, context: AuthorizationContext) -> SessionProfile
         ),
         permissions=sorted(
             permission.value for permission in context.granted_permissions()
+        ),
+        is_platform_administrator=is_platform_administrator,
+        identity_lenses=(
+            [IdentityLens.model_validate(item) for item in build_identity_lenses()]
+            if is_platform_administrator
+            else []
         ),
         receives_daily_digest=account.receives_daily_digest,
         receives_activity_notices=account.receives_activity_notices,

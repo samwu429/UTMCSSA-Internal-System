@@ -15,6 +15,10 @@ from uuid import UUID
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config.organization.offices import (
+    PLATFORM_ADMINISTRATOR_ROLE_KEY,
+    RETIRED_OFFICER_ROLE_KEY,
+)
 from app.core.errors.exceptions import PermissionDenied, ResourceConflict, ResourceNotFound
 from app.core.security.authorization.evaluator import AuthorizationContext
 from app.core.security.authorization.permissions.catalog import (
@@ -133,6 +137,9 @@ async def list_roles(
         )
 
     roles = (await session.execute(statement)).unique().scalars().all()
+    roles = [role for role in roles if role.key != RETIRED_OFFICER_ROLE_KEY]
+    if not context.is_platform_administrator:
+        roles = [role for role in roles if role.key != PLATFORM_ADMINISTRATOR_ROLE_KEY]
     counts = await _assignment_counts(session)
     return [_to_summary(role, counts.get(role.id, 0)) for role in roles]
 

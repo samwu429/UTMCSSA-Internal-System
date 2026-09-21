@@ -21,10 +21,14 @@ import { SelectField } from '@/shared/ui/primitives/field/SelectField'
 import { TextAreaField } from '@/shared/ui/primitives/field/TextAreaField'
 import { TextField } from '@/shared/ui/primitives/field/TextField'
 import { Panel } from '@/shared/ui/primitives/surface/Panel'
+import { useSession } from '@/features/authentication/session/context/useSession'
+import { HIDDEN_ROLE_KEYS } from '@/shared/organization/offices'
 
 export function PermissionSetEditorPane() {
   const toasts = useToastController()
   const queryClient = useQueryClient()
+  const { profile } = useSession()
+  const canSeeHiddenRoles = profile?.is_platform_administrator === true
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
 
@@ -69,7 +73,12 @@ export function PermissionSetEditorPane() {
       >
         {(roles) => (
           <div className="grid gap-4 md:grid-cols-2">
-            {roles.map((role) => (
+            {roles
+              .filter(
+                (role) =>
+                  canSeeHiddenRoles || role.key == null || !HIDDEN_ROLE_KEYS.includes(role.key),
+              )
+              .map((role) => (
               <RoleCard
                 key={role.id}
                 role={role}

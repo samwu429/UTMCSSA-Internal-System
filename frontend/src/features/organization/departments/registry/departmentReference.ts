@@ -29,12 +29,6 @@ export const DEPARTMENT_REFERENCES: readonly DepartmentReference[] = [
   { slug: 'publicity', name_zh: '宣传部', name_en: 'Publicity', accent_color: '#7D3C98' },
   { slug: 'academic', name_zh: '学术部', name_en: 'Academic', accent_color: '#1F618D' },
   { slug: 'alumni', name_zh: '毕业生校友', name_en: 'Alumni Network', accent_color: '#946B2D' },
-  {
-    slug: 'platform-admin',
-    name_zh: '管理员账户',
-    name_en: 'Platform Administration',
-    accent_color: '#2C3E50',
-  },
 ]
 
 export function findDepartmentReference(slug: string): DepartmentReference | undefined {

@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.core.security.authorization.scopes import GrantScope
 from app.domain.identity.models.enums import AccountStatus, AffiliationType
@@ -36,6 +36,18 @@ class PortalConfiguration(BaseModel):
     portal_path: str
 
 
+class IdentityLens(BaseModel):
+    """One office the hidden administrator may preview, including that office's permissions."""
+
+    department_slug: str
+    department_name_en: str
+    department_name_zh: str
+    office_key: str
+    office_name_en: str
+    office_name_zh: str
+    permissions: list[str]
+
+
 class MembershipSummary(BaseModel):
     """One department affiliation as shown in the account switcher."""
 
@@ -48,6 +60,7 @@ class MembershipSummary(BaseModel):
     department_name_zh: str
     department_accent_color: str
     role_id: UUID
+    role_key: str | None = None
     role_name_en: str
     role_name_zh: str
     role_scope: GrantScope
@@ -79,6 +92,11 @@ class SessionProfile(BaseModel):
     # use. Every action is authorized again on the server.
     # 已排序的权限标识，前端仅用于隐藏不可用控件；所有操作在服务端二次鉴权。
     permissions: list[str]
+    # Present only on the hidden platform account so it can preview any office without advertising
+    # that capability to other members.
+    # 仅出现在隐藏的平台账号上，使其可预览任意职务，而不向其他成员暴露这一能力。
+    is_platform_administrator: bool = False
+    identity_lenses: list[IdentityLens] = Field(default_factory=list)
 
     receives_daily_digest: bool
     receives_activity_notices: bool

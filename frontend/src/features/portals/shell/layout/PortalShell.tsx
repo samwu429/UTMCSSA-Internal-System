@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { Outlet, useParams } from 'react-router'
 import { canOpenEveryDepartmentPortal } from '@/app/routing/guards/canEnterDepartmentPortal'
 import { useAuthenticatedMember } from '@/features/authentication/session/context/useAuthenticatedMember'
+import { useSession } from '@/features/authentication/session/context/useSession'
 import { portalQueryKeys } from '@/features/portals/shell/api/portalQueryKeys'
 import { PortalWorkspaceContext } from '@/features/portals/shell/context/portalWorkspaceContext'
 import type { PortalWorkspace } from '@/features/portals/shell/context/portalWorkspaceValue'
@@ -18,6 +19,7 @@ import { QueryStateBoundary } from '@/shared/ui/feedback/QueryStateBoundary'
 export function PortalShell() {
   const { departmentSlug = '' } = useParams()
   const profile = useAuthenticatedMember()
+  const { actingIdentity } = useSession()
 
   const portalQuery = useQuery({
     queryKey: portalQueryKeys.configuration(departmentSlug),
@@ -45,7 +47,7 @@ export function PortalShell() {
           portal={portal}
           departments={departmentsQuery.data ?? []}
           profileMemberships={profile.memberships}
-          canOpenEveryDepartment={canOpenEveryDepartmentPortal(profile)}
+          canOpenEveryDepartment={canOpenEveryDepartmentPortal(profile, actingIdentity)}
         />
       )}
     </QueryStateBoundary>
@@ -75,7 +77,7 @@ function PortalWorkspaceInner({
       switchableDepartments: canOpenEveryDepartment
         ? (departments.length > 0
             ? departments
-                .filter((item) => item.is_active)
+                .filter((item) => item.is_active && item.slug !== 'platform-admin')
                 .map((item) => ({ slug: item.slug, name_zh: item.name_zh }))
             : [...OVERSIGHT_DEPARTMENT_OPTIONS])
         : profileMemberships.map((item) => ({

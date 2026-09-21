@@ -14,6 +14,10 @@ import { SelectField } from '@/shared/ui/primitives/field/SelectField'
 import { TextField } from '@/shared/ui/primitives/field/TextField'
 import { Panel } from '@/shared/ui/primitives/surface/Panel'
 import { composeClassNames } from '@/shared/ui/styling/composeClassNames'
+import {
+  defaultRoleIdForDepartment,
+  rolesAssignableInDepartment,
+} from '@/shared/organization/offices'
 
 export function ApprovalCard({
   application,
@@ -36,7 +40,13 @@ export function ApprovalCard({
   const [titleZh, setTitleZh] = useState('')
   const [reason, setReason] = useState('')
   const resolvedDepartmentId = departmentId !== '' ? departmentId : (preferred?.id ?? departments[0]?.id ?? '')
-  const resolvedRoleId = roleId !== '' ? roleId : (roles[0]?.id ?? '')
+  const resolvedDepartmentSlug =
+    departments.find((item) => item.id === resolvedDepartmentId)?.slug ?? ''
+  const assignableRoles = rolesAssignableInDepartment(roles, resolvedDepartmentSlug)
+  const resolvedRoleId =
+    roleId !== '' && assignableRoles.some((role) => role.id === roleId)
+      ? roleId
+      : defaultRoleIdForDepartment(roles, resolvedDepartmentSlug)
 
   return (
     <Panel
@@ -62,19 +72,26 @@ export function ApprovalCard({
         label="分配到哪个部门"
         value={resolvedDepartmentId}
         options={departments.map((item) => ({ value: item.id, label: item.name_zh }))}
-        onChange={(event) => setDepartmentId(event.target.value)}
+        onChange={(event) => {
+          setDepartmentId(event.target.value)
+          setRoleId('')
+          setTitleZh('')
+        }}
       />
 
       <fieldset className="mt-4">
         <legend className="mb-2 text-sm font-medium text-neutral-800">这个人能做什么</legend>
         <div className="grid gap-2 md:grid-cols-2">
-          {roles.map((role) => {
+          {assignableRoles.map((role) => {
             const isSelected = role.id === resolvedRoleId
             return (
               <button
                 key={role.id}
                 type="button"
-                onClick={() => setRoleId(role.id)}
+                onClick={() => {
+                  setRoleId(role.id)
+                  setTitleZh(role.name_zh)
+                }}
                 className={composeClassNames(
                   'rounded-lg border px-3 py-3 text-left transition-colors',
                   isSelected
@@ -96,7 +113,7 @@ export function ApprovalCard({
         <TextField
           label="职务称呼（可选）"
           value={titleZh}
-          placeholder="例如 活动部干事"
+          placeholder="例如 部长"
           onChange={(event) => setTitleZh(event.target.value)}
         />
         <TextField
@@ -113,7 +130,10 @@ export function ApprovalCard({
             void approveRegistration(application.user_id, {
               department_id: resolvedDepartmentId,
               role_id: resolvedRoleId,
-              title_zh: titleZh || null,
+              title_zh:
+                titleZh ||
+                assignableRoles.find((role) => role.id === resolvedRoleId)?.name_zh ||
+                null,
             })
               .then(onApproved)
               .catch(onFailure)

@@ -1,17 +1,26 @@
-"""Pre-built permission sets offered to the presidium as one-click starting points.
+"""Pre-built permission sets offered as named offices.
 
-The admin console presents these as named cards ("what can this person do?") instead of raw
-permission identifiers. Templates are seeded as regular roles, so they can be edited or extended
-afterwards without touching code.
+Regular departments distinguish 部长, 副部长, and 部员. The presidium has four seats. The
+platform administrator bundle is seeded for the hidden technical account only.
 
-面向主席团的预置权限集合，管理后台以「这个人能做什么」的卡片形式呈现，而非罗列权限标识。
-模板以普通角色形式写入数据库，后续可直接编辑或扩展，无需改动代码。
+各部门区部长、副部长与部员；主席团为四个席位。平台管理员集合仅供隐藏的技术账号使用。
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
+from app.core.config.organization.offices import (
+    ALUMNUS_ROLE_KEY,
+    DEPARTMENT_DEPUTY_ROLE_KEY,
+    DEPARTMENT_DIRECTOR_ROLE_KEY,
+    DEPARTMENT_MEMBER_ROLE_KEY,
+    PLATFORM_ADMINISTRATOR_ROLE_KEY,
+    PRESIDIUM_EXTERNAL_VP_ROLE_KEY,
+    PRESIDIUM_INTERNAL_VP_ROLE_KEY,
+    PRESIDIUM_PRESIDENT_ROLE_KEY,
+    PRESIDIUM_SECRETARY_GENERAL_ROLE_KEY,
+)
 from app.core.security.authorization.permissions.catalog import Permission
 from app.core.security.authorization.scopes import GrantScope
 
@@ -30,7 +39,7 @@ class RoleTemplate:
     sort_order: int = 0
 
 
-_DEPARTMENT_MEMBER_PERMISSIONS: tuple[Permission, ...] = (
+_MEMBER_PERMISSIONS: tuple[Permission, ...] = (
     Permission.DIRECTORY_VIEW,
     Permission.DOCUMENTS_VIEW,
     Permission.DOCUMENTS_UPLOAD,
@@ -38,80 +47,153 @@ _DEPARTMENT_MEMBER_PERMISSIONS: tuple[Permission, ...] = (
     Permission.ALUMNI_VIEW,
 )
 
-_DEPARTMENT_LEAD_PERMISSIONS: tuple[Permission, ...] = (
-    *_DEPARTMENT_MEMBER_PERMISSIONS,
+_DEPUTY_PERMISSIONS: tuple[Permission, ...] = (
+    *_MEMBER_PERMISSIONS,
     Permission.DIRECTORY_VIEW_CONTACT_DETAILS,
-    Permission.DIRECTORY_EXPORT,
     Permission.DOCUMENTS_EDIT,
-    Permission.DOCUMENTS_DELETE,
-    Permission.DOCUMENTS_MANAGE_CATEGORIES,
     Permission.EVENTS_CREATE,
     Permission.EVENTS_EDIT,
     Permission.NOTIFICATIONS_SEND_DEPARTMENT,
 )
 
+_DIRECTOR_PERMISSIONS: tuple[Permission, ...] = (
+    *_DEPUTY_PERMISSIONS,
+    Permission.DIRECTORY_EXPORT,
+    Permission.DOCUMENTS_DELETE,
+    Permission.DOCUMENTS_MANAGE_CATEGORIES,
+    Permission.EVENTS_DELETE,
+)
+
+_SECRETARY_GENERAL_PERMISSIONS: tuple[Permission, ...] = (
+    *_MEMBER_PERMISSIONS,
+    Permission.DIRECTORY_VIEW_ALL_DEPARTMENTS,
+    Permission.DIRECTORY_VIEW_CONTACT_DETAILS,
+    Permission.DIRECTORY_EDIT_ANY_PROFILE,
+    Permission.DIRECTORY_EXPORT,
+    Permission.DOCUMENTS_VIEW_ALL_DEPARTMENTS,
+    Permission.DOCUMENTS_EDIT,
+    Permission.DOCUMENTS_MANAGE_CATEGORIES,
+    Permission.EVENTS_CREATE,
+    Permission.EVENTS_EDIT,
+    Permission.NOTIFICATIONS_SEND_ORGANIZATION,
+    Permission.ADMIN_REVIEW_REGISTRATIONS,
+    Permission.ADMIN_ASSIGN_DEPARTMENTS,
+    Permission.ADMIN_VIEW_AUDIT_LOG,
+)
+
+_INTERNAL_VP_PERMISSIONS: tuple[Permission, ...] = (
+    *_DIRECTOR_PERMISSIONS,
+    Permission.DIRECTORY_VIEW_ALL_DEPARTMENTS,
+    Permission.DIRECTORY_EDIT_ANY_PROFILE,
+    Permission.DOCUMENTS_VIEW_ALL_DEPARTMENTS,
+    Permission.EVENTS_PUBLISH,
+    Permission.NOTIFICATIONS_SEND_ORGANIZATION,
+    Permission.ADMIN_REVIEW_REGISTRATIONS,
+    Permission.ADMIN_ASSIGN_DEPARTMENTS,
+    Permission.ADMIN_MANAGE_DEPARTMENTS,
+    Permission.ADMIN_DEACTIVATE_ACCOUNTS,
+    Permission.ADMIN_VIEW_AUDIT_LOG,
+)
+
+_EXTERNAL_VP_PERMISSIONS: tuple[Permission, ...] = (
+    *_DIRECTOR_PERMISSIONS,
+    Permission.DIRECTORY_VIEW_ALL_DEPARTMENTS,
+    Permission.DOCUMENTS_VIEW_ALL_DEPARTMENTS,
+    Permission.EVENTS_PUBLISH,
+    Permission.ALUMNI_MANAGE,
+    Permission.NOTIFICATIONS_SEND_ORGANIZATION,
+)
+
+_PRESIDENT_PERMISSIONS: tuple[Permission, ...] = (
+    *_DIRECTOR_PERMISSIONS,
+    Permission.DIRECTORY_VIEW_ALL_DEPARTMENTS,
+    Permission.DIRECTORY_EDIT_ANY_PROFILE,
+    Permission.DOCUMENTS_VIEW_ALL_DEPARTMENTS,
+    Permission.EVENTS_PUBLISH,
+    Permission.ALUMNI_MANAGE,
+    Permission.NOTIFICATIONS_SEND_ORGANIZATION,
+    Permission.ADMIN_REVIEW_REGISTRATIONS,
+    Permission.ADMIN_ASSIGN_DEPARTMENTS,
+    Permission.ADMIN_MANAGE_ROLES,
+    Permission.ADMIN_MANAGE_DEPARTMENTS,
+    Permission.ADMIN_DEACTIVATE_ACCOUNTS,
+    Permission.ADMIN_VIEW_AUDIT_LOG,
+)
+
 
 ROLE_TEMPLATES: tuple[RoleTemplate, ...] = (
     RoleTemplate(
-        key="department_member",
+        key=DEPARTMENT_MEMBER_ROLE_KEY,
         name_en="Department Member",
-        name_zh="部门成员",
+        name_zh="部员",
         description_en="Reads the department roster, opens shared files, and uploads their own work.",
         description_zh="查看本部门名单、打开共享文件并上传自己的成果。",
         scope=GrantScope.DEPARTMENT,
-        permissions=_DEPARTMENT_MEMBER_PERMISSIONS,
+        permissions=_MEMBER_PERMISSIONS,
         sort_order=10,
     ),
     RoleTemplate(
-        key="department_officer",
-        name_en="Department Officer",
-        name_zh="部门干事",
-        description_en="Everything a member can do, plus drafting activities and tidying files.",
-        description_zh="在部门成员基础上，可起草活动并整理文件。",
+        key=DEPARTMENT_DEPUTY_ROLE_KEY,
+        name_en="Deputy Director",
+        name_zh="副部长",
+        description_en="Assists the director: drafts activities, edits files, and emails the department.",
+        description_zh="协助部长：起草活动、整理文件，并向本部门发信。",
         scope=GrantScope.DEPARTMENT,
-        permissions=(
-            *_DEPARTMENT_MEMBER_PERMISSIONS,
-            Permission.DOCUMENTS_EDIT,
-            Permission.EVENTS_CREATE,
-        ),
+        permissions=_DEPUTY_PERMISSIONS,
         sort_order=20,
     ),
     RoleTemplate(
-        key="department_lead",
-        name_en="Department Lead",
-        name_zh="部长 / 副部长",
-        description_en="Runs the department: manages its files, activities, and internal emails.",
-        description_zh="负责部门运转：管理本部门文件、活动与内部邮件。",
+        key=DEPARTMENT_DIRECTOR_ROLE_KEY,
+        name_en="Director",
+        name_zh="部长",
+        description_en="Runs the department: files, activities, roster export, and internal mail.",
+        description_zh="主持本部门：文件、活动、名录导出与部门内部邮件。",
         scope=GrantScope.DEPARTMENT,
-        permissions=_DEPARTMENT_LEAD_PERMISSIONS,
+        permissions=_DIRECTOR_PERMISSIONS,
         sort_order=30,
     ),
     RoleTemplate(
-        key="executive",
-        name_en="Presidium Executive",
-        name_zh="主席团成员",
-        description_en="Oversees every department, approves registrations, and assigns permissions.",
-        description_zh="监管所有部门，审批注册申请并分配权限。",
+        key=PRESIDIUM_EXTERNAL_VP_ROLE_KEY,
+        name_en="External Vice President",
+        name_zh="外务副主席",
+        description_en="External affairs: alumni, partnerships, publishing, and association-wide mail.",
+        description_zh="外务：校友与对外联络、活动发布，以及全社邮件。",
         scope=GrantScope.ORGANIZATION,
-        permissions=(
-            *_DEPARTMENT_LEAD_PERMISSIONS,
-            Permission.DIRECTORY_VIEW_ALL_DEPARTMENTS,
-            Permission.DIRECTORY_EDIT_ANY_PROFILE,
-            Permission.DOCUMENTS_VIEW_ALL_DEPARTMENTS,
-            Permission.EVENTS_PUBLISH,
-            Permission.EVENTS_DELETE,
-            Permission.ALUMNI_MANAGE,
-            Permission.NOTIFICATIONS_SEND_ORGANIZATION,
-            Permission.ADMIN_REVIEW_REGISTRATIONS,
-            Permission.ADMIN_ASSIGN_DEPARTMENTS,
-            Permission.ADMIN_MANAGE_ROLES,
-            Permission.ADMIN_DEACTIVATE_ACCOUNTS,
-            Permission.ADMIN_VIEW_AUDIT_LOG,
-        ),
+        permissions=_EXTERNAL_VP_PERMISSIONS,
         sort_order=40,
     ),
     RoleTemplate(
-        key="alumnus",
+        key=PRESIDIUM_INTERNAL_VP_ROLE_KEY,
+        name_en="Internal Vice President",
+        name_zh="内务副主席",
+        description_en="Internal affairs: placements, department structure, and account status.",
+        description_zh="内务：成员归属、部门结构与账号状态。",
+        scope=GrantScope.ORGANIZATION,
+        permissions=_INTERNAL_VP_PERMISSIONS,
+        sort_order=50,
+    ),
+    RoleTemplate(
+        key=PRESIDIUM_SECRETARY_GENERAL_ROLE_KEY,
+        name_en="Secretary-General",
+        name_zh="秘书长",
+        description_en="Records, registrations, and the association's paper trail.",
+        description_zh="文书、注册审批与全社档案流转。",
+        scope=GrantScope.ORGANIZATION,
+        permissions=_SECRETARY_GENERAL_PERMISSIONS,
+        sort_order=60,
+    ),
+    RoleTemplate(
+        key=PRESIDIUM_PRESIDENT_ROLE_KEY,
+        name_en="President",
+        name_zh="主席",
+        description_en="Leads the association: approvals, placements, permission sets, and oversight.",
+        description_zh="主持社团：审批、归属、权限集合与跨部门监管。",
+        scope=GrantScope.ORGANIZATION,
+        permissions=_PRESIDENT_PERMISSIONS,
+        sort_order=70,
+    ),
+    RoleTemplate(
+        key=ALUMNUS_ROLE_KEY,
         name_en="Alumnus",
         name_zh="毕业生校友",
         description_en="Keeps access to the alumni network and public activities after graduation.",
@@ -122,17 +204,17 @@ ROLE_TEMPLATES: tuple[RoleTemplate, ...] = (
             Permission.EVENTS_VIEW,
             Permission.DOCUMENTS_VIEW,
         ),
-        sort_order=50,
+        sort_order=80,
     ),
     RoleTemplate(
-        key="platform_administrator",
+        key=PLATFORM_ADMINISTRATOR_ROLE_KEY,
         name_en="Platform Administrator",
         name_zh="平台管理员",
-        description_en="Full technical control, including departments, roles, and platform settings.",
-        description_zh="完整技术控制权，含部门、角色与平台设置。",
+        description_en="Hidden technical control of the platform. Not assigned to association officers.",
+        description_zh="平台技术控制权，不对社团职务开放。",
         scope=GrantScope.ORGANIZATION,
         permissions=tuple(Permission),
-        sort_order=60,
+        sort_order=90,
     ),
 )
 
@@ -140,5 +222,3 @@ ROLE_TEMPLATES: tuple[RoleTemplate, ...] = (
 ROLE_TEMPLATES_BY_KEY: dict[str, RoleTemplate] = {
     template.key: template for template in ROLE_TEMPLATES
 }
-
-PLATFORM_ADMINISTRATOR_ROLE_KEY = "platform_administrator"
