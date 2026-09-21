@@ -51,6 +51,7 @@ def build_context(account: UserAccount) -> AuthorizationContext:
             is_primary=membership.is_primary,
             permissions=membership.role.permission_set,
             scope=membership.role.scope,
+            role_key=membership.role.key,
         )
         for membership in account.memberships
         if membership.is_current and membership.department.is_active

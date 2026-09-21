@@ -25,9 +25,9 @@ export function AwaitingApprovalPage() {
 
   return (
     <AuthenticationLayout
-      title="等待主席团审批"
+      title="等待部门审批"
       englishTitle="Awaiting approval"
-      description="您的学校邮箱已验证成功。接下来由主席团确认您的部门归属，确认后账号即可使用。"
+      description="您的学校邮箱已验证成功。接下来由该部门的部长或副部长确认您加入为部员，确认后账号即可使用。"
       footer={
         hasStoredSession ? (
           <span>不再等待？可先退出登录，稍后凭同一邮箱重新登录查看结果。</span>
@@ -63,9 +63,9 @@ export function AwaitingApprovalPage() {
               3
             </span>
             <span>
-              <span className="font-medium text-neutral-900">主席团安排部门归属</span>
+              <span className="font-medium text-neutral-900">部长或副部长审批入部</span>
               <span className="mt-0.5 block text-xs text-neutral-500">
-                进行中。主席团成员会在管理后台的「待审批注册」中看到您的申请，并为您选择部门与权限。
+                进行中。您申请加入的部门负责人会在「任职」里看到申请，通过后您将成为该部门部员。
               </span>
             </span>
           </li>

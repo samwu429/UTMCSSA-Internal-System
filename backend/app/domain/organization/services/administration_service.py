@@ -18,6 +18,11 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config.organization.appointment_rules import (
+    MEMBER_ADMISSION_OFFICE,
+    can_review_department,
+    reviewable_department_slugs,
+)
 from app.core.config.settings import get_settings
 from app.core.errors.exceptions import PermissionDenied, ResourceConflict, ResourceNotFound
 from app.core.security.authorization.evaluator import AuthorizationContext
@@ -66,6 +71,13 @@ async def list_pending_registrations(
         .order_by(UserAccount.created_at.asc())
     )
     accounts = (await session.execute(statement)).unique().scalars().all()
+    allowed_slugs = reviewable_department_slugs(context)
+    if allowed_slugs is not None:
+        accounts = [
+            account
+            for account in accounts
+            if account.requested_department_slug in allowed_slugs
+        ]
 
     return [
         PendingRegistration(
@@ -100,7 +112,6 @@ async def approve_registration(
             message_en="You cannot review registration requests.",
             message_zh="你没有审批注册申请的权限。",
         )
-    membership_service.assert_may_assign(context, payload.department_id)
 
     account = await _require_account(session, user_id)
     if account.status not in {AccountStatus.PENDING_APPROVAL, AccountStatus.REJECTED}:
@@ -109,12 +120,13 @@ async def approve_registration(
             message_zh="该账号当前不处于待审批状态。",
         )
 
-    department = await session.get(Department, payload.department_id)
-    role = await session.get(Role, payload.role_id)
-    if department is None or role is None:
-        raise ResourceNotFound(
-            message_en="The department or permission set could not be found.",
-            message_zh="未找到对应的部门或权限集合。",
+    department, role = await _resolve_admission_placement(session, context, account, payload)
+    if not can_review_department(
+        context, department_id=department.id, department_slug=department.slug
+    ):
+        raise PermissionDenied(
+            message_en="You cannot admit members into that department.",
+            message_zh="你不能批准成员进入该部门。",
         )
 
     await membership_service.assign(
@@ -125,8 +137,8 @@ async def approve_registration(
             department_id=department.id,
             role_id=role.id,
             is_primary=True,
-            title_en=payload.title_en,
-            title_zh=payload.title_zh,
+            title_en=payload.title_en or role.name_en,
+            title_zh=payload.title_zh or role.name_zh,
             term_label=payload.term_label,
         ),
     )
@@ -188,6 +200,15 @@ async def reject_registration(
         )
 
     account = await _require_account(session, user_id)
+    allowed_slugs = reviewable_department_slugs(context)
+    if (
+        allowed_slugs is not None
+        and account.requested_department_slug not in allowed_slugs
+    ):
+        raise PermissionDenied(
+            message_en="You cannot decide this registration request.",
+            message_zh="你不能处理该注册申请。",
+        )
     account.status = AccountStatus.REJECTED
     await session.flush()
 
@@ -364,6 +385,52 @@ async def list_audit_entries(
         for entry, actor_name in rows.all()
     ]
     return AuditEntryPage(items=items, total=total, page=page, page_size=page_size)
+
+
+async def _resolve_admission_placement(
+    session: AsyncSession,
+    context: AuthorizationContext,
+    account: UserAccount,
+    payload: RegistrationApproval,
+) -> tuple[Department, Role]:
+    """Directors and deputies always admit the applicant as a member of their department.
+
+    部长与副部长始终将申请人作为本部门部员接收。
+    """
+    member_role = (
+        await session.execute(select(Role).where(Role.key == MEMBER_ADMISSION_OFFICE))
+    ).scalar_one_or_none()
+    if member_role is None:
+        raise ResourceNotFound(
+            message_en="The member office could not be found.",
+            message_zh="未找到部员权限集合。",
+        )
+
+    if context.is_platform_administrator:
+        department = await session.get(Department, payload.department_id)
+        role = await session.get(Role, payload.role_id)
+        if department is None or role is None:
+            raise ResourceNotFound(
+                message_en="The department or permission set could not be found.",
+                message_zh="未找到对应的部门或权限集合。",
+            )
+        return department, role
+
+    requested = account.requested_department_slug
+    if requested is None:
+        raise ResourceConflict(
+            message_en="This application did not name a department.",
+            message_zh="该申请未选择部门，无法按部门审批。",
+        )
+    department = (
+        await session.execute(select(Department).where(Department.slug == requested))
+    ).scalar_one_or_none()
+    if department is None:
+        raise ResourceNotFound(
+            message_en="The requested department could not be found.",
+            message_zh="未找到申请人所选部门。",
+        )
+    return department, member_role
 
 
 async def _require_account(session: AsyncSession, user_id: UUID) -> UserAccount:

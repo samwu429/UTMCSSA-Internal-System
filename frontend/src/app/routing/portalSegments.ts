@@ -20,6 +20,7 @@ export const portalSegments = {
   network: 'network',
   oversight: 'oversight',
   admin: 'admin',
+  appointments: 'appointments',
   profile: 'profile',
 } as const
 

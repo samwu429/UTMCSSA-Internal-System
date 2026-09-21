@@ -113,7 +113,7 @@ function OverviewPane() {
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <StatisticTile label="在册成员" value={snapshot.total_active_members} />
           <StatisticTile label="毕业生" value={snapshot.total_alumni} />
-          <StatisticTile label="待审批" value={snapshot.pending_registrations} caption="需要主席团处理" />
+          <StatisticTile label="待审批" value={snapshot.pending_registrations} caption="由部长或副部长处理入部申请" />
           <StatisticTile label="已停用" value={snapshot.suspended_accounts} />
           <StatisticTile label="部门" value={snapshot.departments} />
           <StatisticTile label="文件" value={snapshot.documents} />

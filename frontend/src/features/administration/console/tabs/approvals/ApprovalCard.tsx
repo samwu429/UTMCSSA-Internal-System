@@ -23,6 +23,7 @@ export function ApprovalCard({
   application,
   departments,
   roles,
+  admissionOnly = false,
   onApproved,
   onRejected,
   onFailure,
@@ -30,6 +31,7 @@ export function ApprovalCard({
   application: PendingRegistration
   departments: readonly { id: string; slug: string; name_zh: string }[]
   roles: readonly RoleSummary[]
+  admissionOnly?: boolean
   onApproved: () => Promise<void>
   onRejected: () => Promise<void>
   onFailure: (error: unknown) => void
@@ -68,60 +70,74 @@ export function ApprovalCard({
         </div>
       </dl>
 
-      <SelectField
-        label="分配到哪个部门"
-        value={resolvedDepartmentId}
-        options={departments.map((item) => ({ value: item.id, label: item.name_zh }))}
-        onChange={(event) => {
-          setDepartmentId(event.target.value)
-          setRoleId('')
-          setTitleZh('')
-        }}
+      {admissionOnly ? (
+        <p className="mb-4 rounded-md border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
+          通过后，该成员将进入
+          {departments.find((item) => item.slug === application.requested_department_slug)?.name_zh ??
+            '所选部门'}
+          担任部员。
+        </p>
+      ) : null}
+
+      {admissionOnly ? null : (
+        <>
+          <SelectField
+            label="分配到哪个部门"
+            value={resolvedDepartmentId}
+            options={departments.map((item) => ({ value: item.id, label: item.name_zh }))}
+            onChange={(event) => {
+              setDepartmentId(event.target.value)
+              setRoleId('')
+              setTitleZh('')
+            }}
+          />
+
+          <fieldset className="mt-4">
+            <legend className="mb-2 text-sm font-medium text-neutral-800">这个人能做什么</legend>
+            <div className="grid gap-2 md:grid-cols-2">
+              {assignableRoles.map((role) => {
+                const isSelected = role.id === resolvedRoleId
+                return (
+                  <button
+                    key={role.id}
+                    type="button"
+                    onClick={() => {
+                      setRoleId(role.id)
+                      setTitleZh(role.name_zh)
+                    }}
+                    className={composeClassNames(
+                      'rounded-lg border px-3 py-3 text-left transition-colors',
+                      isSelected
+                        ? 'border-[var(--portal-accent)] bg-[var(--portal-accent-soft)]'
+                        : 'border-neutral-200 hover:border-neutral-300',
+                    )}
+                  >
+                    <p className="text-sm font-medium text-neutral-900">{role.name_zh}</p>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {role.description_zh ?? role.description_en ?? role.name_en}
+                    </p>
+                  </button>
+                )
+              })}
+            </div>
+          </fieldset>
+
+          <TextField
+            label="职务称呼（可选）"
+            value={titleZh}
+            placeholder="例如 部长"
+            containerClassName="mt-4"
+            onChange={(event) => setTitleZh(event.target.value)}
+          />
+        </>
+      )}
+
+      <TextField
+        label="拒绝理由（仅拒绝时填写）"
+        value={reason}
+        containerClassName="mt-4"
+        onChange={(event) => setReason(event.target.value)}
       />
-
-      <fieldset className="mt-4">
-        <legend className="mb-2 text-sm font-medium text-neutral-800">这个人能做什么</legend>
-        <div className="grid gap-2 md:grid-cols-2">
-          {assignableRoles.map((role) => {
-            const isSelected = role.id === resolvedRoleId
-            return (
-              <button
-                key={role.id}
-                type="button"
-                onClick={() => {
-                  setRoleId(role.id)
-                  setTitleZh(role.name_zh)
-                }}
-                className={composeClassNames(
-                  'rounded-lg border px-3 py-3 text-left transition-colors',
-                  isSelected
-                    ? 'border-[var(--portal-accent)] bg-[var(--portal-accent-soft)]'
-                    : 'border-neutral-200 hover:border-neutral-300',
-                )}
-              >
-                <p className="text-sm font-medium text-neutral-900">{role.name_zh}</p>
-                <p className="mt-1 text-xs text-neutral-500">
-                  {role.description_zh ?? role.description_en ?? role.name_en}
-                </p>
-              </button>
-            )
-          })}
-        </div>
-      </fieldset>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <TextField
-          label="职务称呼（可选）"
-          value={titleZh}
-          placeholder="例如 部长"
-          onChange={(event) => setTitleZh(event.target.value)}
-        />
-        <TextField
-          label="拒绝理由（仅拒绝时填写）"
-          value={reason}
-          onChange={(event) => setReason(event.target.value)}
-        />
-      </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
         <Button
@@ -139,7 +155,7 @@ export function ApprovalCard({
               .catch(onFailure)
           }}
         >
-          通过并送入该部门
+          {admissionOnly ? '同意进入部门担任部员' : '通过并送入该部门'}
         </Button>
         <Button
           variant="danger"
@@ -153,18 +169,20 @@ export function ApprovalCard({
         >
           拒绝
         </Button>
-        <Button
-          onClick={() => {
-            void changeAccountStatus(application.user_id, {
-              status: AccountStatus.SUSPENDED,
-              reason: '主席团临时冻结',
-            })
-              .then(onRejected)
-              .catch(onFailure)
-          }}
-        >
-          停用账号
-        </Button>
+        {admissionOnly ? null : (
+          <Button
+            onClick={() => {
+              void changeAccountStatus(application.user_id, {
+                status: AccountStatus.SUSPENDED,
+                reason: '主席团临时冻结',
+              })
+                .then(onRejected)
+                .catch(onFailure)
+            }}
+          >
+            停用账号
+          </Button>
+        )}
       </div>
     </Panel>
   )

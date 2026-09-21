@@ -14,6 +14,7 @@ import { RegistrationPage } from '@/features/authentication/registration/pages/R
 import { EmailVerificationPage } from '@/features/authentication/verification/pages/EmailVerificationPage'
 import { AccountProfilePage } from '@/features/account/profile/pages/AccountProfilePage'
 import { AdministrationConsolePage } from '@/features/administration/console/pages/AdministrationConsolePage'
+import { AppointmentsPage } from '@/features/organization/appointments/pages/AppointmentsPage'
 import { ActivityCalendarPage } from '@/features/activities/calendar/pages/ActivityCalendarPage'
 import { AnnouncementsPage } from '@/features/activities/announcements/pages/AnnouncementsPage'
 import { CourseTimetablePage } from '@/features/academics/timetable/pages/CourseTimetablePage'
@@ -58,6 +59,7 @@ export function ApplicationRouter() {
             <Route path={portalSegments.network} element={<AlumniNetworkPage />} />
             <Route path={portalSegments.oversight} element={<OversightPage />} />
             <Route path={portalSegments.admin} element={<AdministrationConsolePage />} />
+            <Route path={portalSegments.appointments} element={<AppointmentsPage />} />
             <Route path={portalSegments.profile} element={<AccountProfilePage />} />
           </Route>
         </Route>

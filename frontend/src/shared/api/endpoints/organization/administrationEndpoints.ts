@@ -10,6 +10,28 @@ import type {
   RegistrationApproval,
   RegistrationRejection,
 } from '@/shared/api/contracts/organization/administration'
+import type {
+  OfficeAppointment,
+  OfficeBoard,
+} from '@/shared/api/contracts/organization/appointment'
+import type { MembershipSummary } from '@/shared/api/contracts/identity/sessionProfile'
+
+export function fetchOfficeBoard(signal?: AbortSignal): Promise<OfficeBoard> {
+  return requestJson<OfficeBoard>('/administration/offices', { signal })
+}
+
+export function appointOffice(payload: OfficeAppointment): Promise<MembershipSummary> {
+  return requestJson<MembershipSummary>('/administration/offices', {
+    method: 'POST',
+    json: payload,
+  })
+}
+
+export function releaseOffice(membershipId: UuidString): Promise<MembershipSummary> {
+  return requestJson<MembershipSummary>(`/administration/offices/${membershipId}/release`, {
+    method: 'POST',
+  })
+}
 
 export function fetchOversightSnapshot(signal?: AbortSignal): Promise<OversightSnapshot> {
   return requestJson<OversightSnapshot>('/administration/overview', { signal })

@@ -9,8 +9,14 @@ import { fetchRoles } from '@/shared/api/endpoints/organization/roleEndpoints'
 import { EmptyState } from '@/shared/ui/feedback/EmptyState'
 import { QueryStateBoundary } from '@/shared/ui/feedback/QueryStateBoundary'
 import { Panel } from '@/shared/ui/primitives/surface/Panel'
+import { useAuthenticatedMember } from '@/features/authentication/session/context/useAuthenticatedMember'
+import { useSession } from '@/features/authentication/session/context/useSession'
+import { isHiddenPlatformAdministrator } from '@/shared/organization/identityCatalog'
 
 export function ApprovalsPane() {
+  const profile = useAuthenticatedMember()
+  const { actingLens } = useSession()
+  const admissionOnly = !(isHiddenPlatformAdministrator(profile) && actingLens === null)
   const toasts = useToastController()
   const queryClient = useQueryClient()
   const pendingQuery = useQuery({
@@ -48,6 +54,7 @@ export function ApprovalsPane() {
                 application={application}
                 departments={departmentsQuery.data ?? []}
                 roles={rolesQuery.data ?? []}
+                admissionOnly={admissionOnly}
                 onApproved={async () => {
                   toasts.showSuccess('已通过，成员会收到邮件并进入所属部门页面。')
                   await queryClient.invalidateQueries({ queryKey: administrationQueryKeys.root })

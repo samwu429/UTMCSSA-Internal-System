@@ -27,6 +27,7 @@ class DepartmentMembershipSnapshot:
     is_primary: bool
     permissions: frozenset[Permission]
     scope: GrantScope
+    role_key: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

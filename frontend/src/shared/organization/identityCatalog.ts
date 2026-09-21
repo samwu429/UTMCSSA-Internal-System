@@ -62,8 +62,6 @@ const SECRETARY_GENERAL_PERMISSIONS: readonly string[] = [
   Permission.EVENTS_CREATE,
   Permission.EVENTS_EDIT,
   Permission.NOTIFICATIONS_SEND_ORGANIZATION,
-  Permission.ADMIN_REVIEW_REGISTRATIONS,
-  Permission.ADMIN_ASSIGN_DEPARTMENTS,
   Permission.ADMIN_VIEW_AUDIT_LOG,
 ]
 
@@ -74,8 +72,6 @@ const INTERNAL_VP_PERMISSIONS: readonly string[] = [
   Permission.DOCUMENTS_VIEW_ALL_DEPARTMENTS,
   Permission.EVENTS_PUBLISH,
   Permission.NOTIFICATIONS_SEND_ORGANIZATION,
-  Permission.ADMIN_REVIEW_REGISTRATIONS,
-  Permission.ADMIN_ASSIGN_DEPARTMENTS,
   Permission.ADMIN_MANAGE_DEPARTMENTS,
   Permission.ADMIN_DEACTIVATE_ACCOUNTS,
   Permission.ADMIN_VIEW_AUDIT_LOG,
@@ -115,12 +111,20 @@ const OFFICE_CATALOG: Record<string, OfficeDescriptor> = {
   [DEPARTMENT_DEPUTY_ROLE_KEY]: {
     name_en: 'Deputy Director',
     name_zh: '副部长',
-    permissions: DEPUTY_PERMISSIONS,
+    permissions: [
+      ...DEPUTY_PERMISSIONS,
+      Permission.ADMIN_REVIEW_REGISTRATIONS,
+      Permission.ADMIN_ASSIGN_DEPARTMENTS,
+    ],
   },
   [DEPARTMENT_DIRECTOR_ROLE_KEY]: {
     name_en: 'Director',
     name_zh: '部长',
-    permissions: DIRECTOR_PERMISSIONS,
+    permissions: [
+      ...DIRECTOR_PERMISSIONS,
+      Permission.ADMIN_REVIEW_REGISTRATIONS,
+      Permission.ADMIN_ASSIGN_DEPARTMENTS,
+    ],
   },
   [PRESIDIUM_EXTERNAL_VP_ROLE_KEY]: {
     name_en: 'External Vice President',

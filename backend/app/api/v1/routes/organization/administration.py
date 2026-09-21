@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query
 
 from app.api.deps.authentication import ContextDependency, SessionDependency
 from app.api.deps.services import DispatcherDependency
+from app.domain.identity.schemas.session_profile import MembershipSummary
 from app.domain.organization.schemas.administration import (
     AccountStatusChange,
     AdministrationActionResult,
@@ -17,9 +18,36 @@ from app.domain.organization.schemas.administration import (
     RegistrationApproval,
     RegistrationRejection,
 )
-from app.domain.organization.services import administration_service
+from app.domain.organization.schemas.appointment import OfficeAppointment, OfficeBoard
+from app.domain.organization.services import administration_service, appointment_service
 
 router = APIRouter(prefix="/administration", tags=["administration"])
+
+
+@router.get("/offices", response_model=OfficeBoard)
+async def read_office_board(
+    session: SessionDependency,
+    context: ContextDependency,
+) -> OfficeBoard:
+    return await appointment_service.list_office_board(session, context)
+
+
+@router.post("/offices", response_model=MembershipSummary, status_code=201)
+async def appoint_office(
+    payload: OfficeAppointment,
+    session: SessionDependency,
+    context: ContextDependency,
+) -> MembershipSummary:
+    return await appointment_service.appoint(session, context, payload)
+
+
+@router.post("/offices/{membership_id}/release", response_model=MembershipSummary)
+async def release_office(
+    membership_id: UUID,
+    session: SessionDependency,
+    context: ContextDependency,
+) -> MembershipSummary:
+    return await appointment_service.release(session, context, membership_id)
 
 
 @router.get("/overview", response_model=OversightSnapshot)

@@ -15,6 +15,11 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config.organization.appointment_rules import (
+    MEMBER_ADMISSION_OFFICE,
+    can_appoint_office,
+    can_release_office,
+)
 from app.core.errors.exceptions import PermissionDenied, ResourceConflict, ResourceNotFound
 from app.core.security.authorization.evaluator import AuthorizationContext
 from app.core.security.authorization.permissions.catalog import Permission
@@ -36,6 +41,7 @@ def to_summary(membership: DepartmentMembership) -> MembershipSummary:
         department_name_zh=membership.department.name_zh,
         department_accent_color=membership.department.accent_color,
         role_id=membership.role_id,
+        role_key=membership.role.key,
         role_name_en=membership.role.name_en,
         role_name_zh=membership.role.name_zh,
         role_scope=membership.role.scope,
@@ -59,7 +65,7 @@ async def assign(
     context: AuthorizationContext,
     payload: MembershipAssignment,
 ) -> MembershipSummary:
-    assert_may_assign(context, payload.department_id)
+    from app.domain.organization.services import appointment_service
 
     department = await session.get(Department, payload.department_id)
     role = await session.get(Role, payload.role_id)
@@ -68,11 +74,23 @@ async def assign(
             message_en="The department or permission set could not be found.",
             message_zh="未找到对应的部门或权限集合。",
         )
+    appointment_service.assert_may_place(
+        context,
+        department_id=department.id,
+        department_slug=department.slug,
+        office_key=role.key,
+    )
     if role.department_id is not None and role.department_id != department.id:
         raise ResourceConflict(
             message_en="That permission set belongs to a different department.",
             message_zh="该权限集合属于其他部门，无法在此使用。",
         )
+    await appointment_service.enforce_seat_capacity(
+        session,
+        department_id=department.id,
+        role=role,
+        incoming_user_id=payload.user_id,
+    )
 
     existing = (
         await session.execute(
@@ -142,6 +160,34 @@ async def modify(
                 message_en="That permission set could not be found.",
                 message_zh="未找到该权限集合。",
             )
+        if role.key == MEMBER_ADMISSION_OFFICE:
+            current_key = membership.role.key
+            if current_key is None or not can_release_office(
+                context,
+                department_id=membership.department_id,
+                department_slug=membership.department.slug,
+                office_key=current_key,
+                holder_user_id=membership.user_id,
+            ):
+                raise PermissionDenied(
+                    message_en="You cannot step this person down from that office.",
+                    message_zh="你不能卸任该职务。",
+                )
+        else:
+            from app.domain.organization.services import appointment_service
+
+            appointment_service.assert_may_place(
+                context,
+                department_id=membership.department_id,
+                department_slug=membership.department.slug,
+                office_key=role.key,
+            )
+            await appointment_service.enforce_seat_capacity(
+                session,
+                department_id=membership.department_id,
+                role=role,
+                incoming_user_id=membership.user_id,
+            )
 
     for field_name, value in changes.items():
         setattr(membership, field_name, value)
@@ -167,6 +213,29 @@ async def revoke(
 ) -> None:
     membership = await _require_loaded(session, membership_id)
     assert_may_assign(context, membership.department_id)
+    office_key = membership.role.key
+    if office_key and office_key != MEMBER_ADMISSION_OFFICE:
+        if not can_release_office(
+            context,
+            department_id=membership.department_id,
+            department_slug=membership.department.slug,
+            office_key=office_key,
+            holder_user_id=membership.user_id,
+        ):
+            raise PermissionDenied(
+                message_en="You cannot remove that office.",
+                message_zh="你不能移除该职务。",
+            )
+    elif not can_appoint_office(
+        context,
+        department_id=membership.department_id,
+        department_slug=membership.department.slug,
+        office_key=MEMBER_ADMISSION_OFFICE,
+    ):
+        raise PermissionDenied(
+            message_en="You cannot remove this member from the department.",
+            message_zh="你不能将该成员移出部门。",
+        )
 
     department_name = membership.department.name_zh
     user_id = membership.user_id

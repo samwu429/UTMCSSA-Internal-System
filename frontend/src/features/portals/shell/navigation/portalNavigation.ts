@@ -75,6 +75,24 @@ export function buildPortalNavigation(
     })
   }
 
+  if (
+    hasAnyPermission(permissions, [
+      Permission.ADMIN_REVIEW_REGISTRATIONS,
+      Permission.ADMIN_ASSIGN_DEPARTMENTS,
+    ])
+  ) {
+    items.push({
+      id: 'appointments',
+      label: '任职',
+      englishLabel: 'Offices',
+      to: routePaths.portalSection(departmentSlug, portalSegments.appointments),
+      requiredPermissions: [
+        Permission.ADMIN_REVIEW_REGISTRATIONS,
+        Permission.ADMIN_ASSIGN_DEPARTMENTS,
+      ],
+    })
+  }
+
   items.push({
     id: 'profile',
     label: '我的档案',
