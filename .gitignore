@@ -1,0 +1,36 @@
+# Secrets: real credentials live only in gitignored local files or deployment secret stores.
+# 密钥：真实凭证仅存放于本地忽略提交的文件或部署侧密钥库。
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.vite/
+frontend/dist/
+*.tsbuildinfo
+
+# Local document vault used by the filesystem storage driver in development.
+# 开发环境文件存储驱动使用的本地文件库目录。
+var/
+storage/local/
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

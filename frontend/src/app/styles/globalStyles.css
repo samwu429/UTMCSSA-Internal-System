@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans:
+    'Inter', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+/*
+  Accent variables are the only place a department's identity enters the stylesheet. The portal
+  shell rewrites them per department, so every themed control reads from here instead of holding
+  its own copy of the colour.
+
+  部门标识仅通过这组变量进入样式表。门户外壳按部门重写这些变量，
+  所有主题化控件据此取色，无需各自保存颜色副本。
+*/
+:root {
+  color-scheme: light;
+  --portal-accent: #2c3e50;
+  --portal-accent-strong: #22303e;
+  --portal-accent-soft: #f2f4f6;
+  --portal-accent-border: #ccd3d9;
+  --portal-accent-contrast: #ffffff;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+  A single visible focus treatment across the application, tinted with the active department
+  accent so keyboard operation stays obvious inside every portal.
+
+  全局统一的焦点样式，并随当前部门主色着色，确保在任一门户中键盘操作位置始终清晰可见。
+*/
+:focus-visible {
+  outline: 2px solid var(--portal-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+dialog::backdrop {
+  background-color: rgb(15 23 42 / 0.45);
+}
+
+dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+  max-width: none;
+  max-height: none;
+}

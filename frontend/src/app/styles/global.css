@@ -1,0 +1,38 @@
+@import 'tailwindcss';
+
+:root {
+  --portal-accent: #8c1d40;
+  --portal-accent-strong: #6f1633;
+  --portal-accent-soft: #f6e8ed;
+  --portal-accent-border: #e3c3ce;
+  --portal-accent-contrast: #ffffff;
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    'Segoe UI',
+    'PingFang SC',
+    'Microsoft YaHei',
+    'Noto Sans SC',
+    sans-serif;
+  background: #f5f5f4;
+  color: #171717;
+}
+
+dialog {
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+dialog::backdrop {
+  background: rgb(23 23 23 / 0.45);
+}
