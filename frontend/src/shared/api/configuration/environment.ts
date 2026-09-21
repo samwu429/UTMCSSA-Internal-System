@@ -9,7 +9,8 @@
 const DEFAULT_API_BASE_URL = 'http://localhost:8000/api/v1'
 
 function normalizeBaseUrl(value: string): string {
-  return value.trim().replace(/\/+$/, '')
+  const trimmed = value.trim().replace(/\/+$/, '')
+  return trimmed.endsWith('/api/v1') ? trimmed : `${trimmed}/api/v1`
 }
 
 export const apiBaseUrl: string = normalizeBaseUrl(
